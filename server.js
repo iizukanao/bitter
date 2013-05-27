@@ -584,10 +584,10 @@
     });
   });
 
-  app.get('/feed.atom', function(req, res) {
+  app.get('/index.atom', function(req, res) {
     var buf, entryUrl, file, title, _i, _len, _ref;
 
-    buf = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<feed xmlns=\"http://www.w3.org/2005/Atom\">\n<title>" + config.siteName + "</title>\n<link href=\"" + config.siteURL + "/feed.atom\" rel=\"self\" />\n<link href=\"" + config.siteURL + "\" />\n<id>" + (escapeTags(config.siteURL + '/')) + "</id>\n<updated>" + (new Date(recentInfo.generatedTime).toISOString()) + "</updated>";
+    buf = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<feed xmlns=\"http://www.w3.org/2005/Atom\">\n<title>" + config.siteName + "</title>\n<link href=\"" + config.siteURL + "/index.atom\" rel=\"self\" />\n<link href=\"" + config.siteURL + "\" />\n<id>" + (escapeTags(config.siteURL + '/')) + "</id>\n<updated>" + (new Date(recentInfo.generatedTime).toISOString()) + "</updated>";
     _ref = recentInfo.recentFiles;
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
       file = _ref[_i];
