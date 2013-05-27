@@ -2,6 +2,8 @@
 
 Waste everything but Git and Markdown
 
+[Example](http://notes.kyu-mu.net/2013/05/27/markdown_example)
+
 ### Requirements
 
 - Node.js v0.10.4 or later
