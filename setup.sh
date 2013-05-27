@@ -50,14 +50,14 @@ cat > config/page.ejs <<EOF
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
   <title><% if (title) { %><%= title %> | <% } %><%= siteName %></title>
-  <link rel="alternate" type="application/atom+xml" href="<%= siteURL %>/feed.atom">
+  <link rel="alternate" type="application/atom+xml" href="<%= siteURL %>/index.atom">
   <link rel="stylesheet" href="/base.css">
 </head>
 <body>
 <div id="header">
   <a href="/"><%= siteName %></a>
   <a href="/recents">Recent entries</a>
-  <a href="/feed.atom">Feed</a>
+  <a href="/index.atom">Feed</a>
 </div>
 <div id="content">
 <%- body -%>

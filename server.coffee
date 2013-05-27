@@ -458,12 +458,12 @@ app.get '/recents', (req, res) ->
     res.send html
 
 # Atom feed
-app.get '/feed.atom', (req, res) ->
+app.get '/index.atom', (req, res) ->
   buf = """
   <?xml version="1.0" encoding="utf-8"?>
   <feed xmlns="http://www.w3.org/2005/Atom">
   <title>#{config.siteName}</title>
-  <link href="#{config.siteURL}/feed.atom" rel="self" />
+  <link href="#{config.siteURL}/index.atom" rel="self" />
   <link href="#{config.siteURL}" />
   <id>#{escapeTags config.siteURL + '/'}</id>
   <updated>#{new Date(recentInfo.generatedTime).toISOString()}</updated>
