@@ -28,7 +28,7 @@ On the client side:
     $ mkdir -p 2013/05
     $ echo "# Test\n\nHello World" > 2013/05/27-test.md
     $ git add .
-    $ git commit -m "add an entry"
+    $ git commit -m "add test entry"
     $ git push
 
 ### To edit an entry
