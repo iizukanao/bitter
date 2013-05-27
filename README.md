@@ -1,6 +1,6 @@
-## Bitter
+## Bitter - minimal blog engine
 
-Minimal blog engine - Waste everything but Git and Markdown
+Waste everything but Git and Markdown
 
 ### Requirements
 
