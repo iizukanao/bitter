@@ -1,6 +1,6 @@
 #!/bin/sh
 
-function setup {
+setup () {
   if [ -e engine/setup.sh ]; then
     echo "It appears you already have set up."
     exit 1
@@ -19,7 +19,7 @@ function setup {
   ./setup.sh
 }
 
-function server {
+server () {
   if [ -e engine/server.js ]; then
     node engine/server.js
   else
