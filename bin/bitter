@@ -6,10 +6,9 @@ function setup {
     exit 1
   fi
 
-  this_file="$(test -L "$0" && readlink "$0" || echo "$0")"
-  pushd `dirname $this_file` > /dev/null
-  script_dir=`pwd -P`
-  popd > /dev/null
+  which_dir="$(dirname $(which $0))"
+  link_dir="$(dirname $(test -L "$0" && readlink "$0" || echo "$0"))"
+  script_dir=$(cd $which_dir/$link_dir; pwd -P)
 
   mkdir engine
   cp $script_dir/../setup.sh engine/setup.sh
