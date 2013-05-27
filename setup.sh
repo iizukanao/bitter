@@ -79,7 +79,7 @@ body {
   max-width: 700px;
   color: #000;
   font-size: 20px;
-  font-family: Times, "Times New Roman", "Hiragino Mincho ProN", "IPAPMincho", serif;
+  font-family: Times, "Times New Roman", "Hiragino Mincho ProN", "IPA P明朝", serif;
   line-height: 1.6;
 }
 
