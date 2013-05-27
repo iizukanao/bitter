@@ -483,11 +483,16 @@ app.get '/feed.atom', (req, res) ->
     <author>
       <name>#{escapeTags config.authorName}</name>
       <uri>#{escapeTags config.authorLink}</uri>
-      <email>#{config.authorEmail}</email>
+
+    """
+    if config.authorEmail
+      buf += "    <email>#{config.authorEmail}</email>"
+    buf += """
+
     </author>
   </entry>
-  """
-  buf += "</feed>"
+    """
+  buf += "\n</feed>\n"
   res.setHeader 'Content-Type', 'text/xml; charset=utf-8'
   res.send buf
 
