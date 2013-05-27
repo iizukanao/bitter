@@ -1,4 +1,4 @@
-bitter
-======
+Bitter
+------
 
-Bitter - the minimal blog engine
+Waste everything but Git and Markdown
