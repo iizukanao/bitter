@@ -1,0 +1,27 @@
+{
+  "name": "bitter",
+  "version": "0.1.0",
+  "author": "Nao Iizuka <iizuka@kyu-mu.net>",
+  "description": "Minimal blog engine",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/iizukanao/bitter.git"
+  },
+  "keywords": [
+    "blog",
+    "engine",
+    "server"
+  ],
+  "dependencies": {
+    "express": "3.x",
+    "marked" : ">=0.2.8",
+    "ejs"    : ">=0.8.4"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=0.10.4"
+  }
+}
