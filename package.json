@@ -1,7 +1,7 @@
 {
   "name": "bitter",
   "preferGlobal": true,
-  "version": "0.1.3",
+  "version": "0.1.4",
   "author": "Nao Iizuka <iizuka@kyu-mu.net>",
   "description": "Minimal blog engine",
   "bin": {
