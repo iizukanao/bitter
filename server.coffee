@@ -304,7 +304,7 @@ createIndex = (numRecents=15) ->
         if ++count >= numRecents
           break
 
-  # Store index into recentInfo object
+  # Hold index in recentInfo
   recentInfo =
     recentFiles: recentFiles
     generatedTime: new Date().getTime()
