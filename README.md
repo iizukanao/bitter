@@ -2,12 +2,12 @@
 
 Waste everything but Git and Markdown
 
-## Requirements
+### Requirements
 
 - Node.js v0.10.4 or later
 - "git" command
 
-## Install
+### Install
 
 On the server side:
 
@@ -21,7 +21,7 @@ On the client side:
 
     $ git clone user@host:blogdir/notes.git
 
-## To post an entry
+### To post an entry
 
 On the client side:
 
@@ -31,14 +31,14 @@ On the client side:
     $ git commit -m "add an entry"
     $ git push
 
-## To edit an entry
+### To edit an entry
 
     $ vim 2013/05/27-test.md
     $ git add -u
     $ git commit -m update
     $ git push
 
-## To delete an entry
+### To delete an entry
 
     $ git rm 2013/05/27-test.md
     $ git commit -m delete
