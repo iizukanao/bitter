@@ -596,9 +596,13 @@
       if ((title == null) || (title === '')) {
         title = '(untitled)';
       }
-      buf += "<entry>\n  <title>" + (escapeTags(title)) + "</title>\n  <link href=\"" + entryUrl + "\" />\n  <id>" + entryUrl + "</id>\n  <updated>" + (new Date(file.time).toISOString()) + "</updated>\n  <content type=\"html\">" + (escapeTags(file.body)) + "</content>\n  <author>\n    <name>" + (escapeTags(config.authorName)) + "</name>\n    <uri>" + (escapeTags(config.authorLink)) + "</uri>\n    <email>" + config.authorEmail + "</email>\n  </author>\n</entry>";
+      buf += "<entry>\n  <title>" + (escapeTags(title)) + "</title>\n  <link href=\"" + entryUrl + "\" />\n  <id>" + entryUrl + "</id>\n  <updated>" + (new Date(file.time).toISOString()) + "</updated>\n  <content type=\"html\">" + (escapeTags(file.body)) + "</content>\n  <author>\n    <name>" + (escapeTags(config.authorName)) + "</name>\n    <uri>" + (escapeTags(config.authorLink)) + "</uri>\n";
+      if (config.authorEmail) {
+        buf += "    <email>" + config.authorEmail + "</email>";
+      }
+      buf += "\n  </author>\n</entry>";
     }
-    buf += "</feed>";
+    buf += "\n</feed>\n";
     res.setHeader('Content-Type', 'text/xml; charset=utf-8');
     return res.send(buf);
   });
@@ -609,7 +613,7 @@
     file = recentInfo.recentFiles[0];
     if (file == null) {
       res.setHeader('Content-Type', 'text/plain; charset=utf-8');
-      res.send("This is the place where your content will appear.\n\nAdd a first entry like this:\n\nmkdir -p 2013/05\necho \"# Test\\n\\nHello World\" > 2013/05/27-test.md\ngit add .\ngit commit -m \"Add an entry\"\ngit push\n\nFinished? Then reload this page slowly.");
+      res.send("This is the place where your content will appear.\n\nAdd a first entry like this:\n\nmkdir -p 2013/05\necho \"# Test\\n\\nHello World\" > 2013/05/27-test.md\ngit add .\ngit commit -m \"add test entry\"\ngit push\n\nFinished? Then reload this page slowly.");
       return;
     }
     filepath = "" + basedir + "/" + file.year + "/" + file.month + "/" + file.datepart + "-" + file.slug + ".md";
