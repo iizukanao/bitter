@@ -235,4 +235,4 @@ cd ../notes.git
 git add .
 git commit -m "Setup"
 
-echo "done"
+echo "\nsetup completed"

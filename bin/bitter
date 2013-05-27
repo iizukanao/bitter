@@ -1,0 +1,41 @@
+#!/bin/sh
+
+function setup {
+  if [ -e engine/setup.sh ]; then
+    echo "It appears you already have set up."
+    exit 1
+  fi
+
+  this_file="$(test -L "$0" && readlink "$0" || echo "$0")"
+  pushd `dirname $this_file` > /dev/null
+  script_dir=`pwd -P`
+  popd > /dev/null
+
+  mkdir engine
+  cp $script_dir/../setup.sh engine/setup.sh
+  cp $script_dir/../server.js engine/server.js
+  ln -s $script_dir/../node_modules engine/node_modules
+
+  cd engine
+  ./setup.sh
+}
+
+function server {
+  if [ -e engine/server.js ]; then
+    node engine/server.js
+  else
+    echo "Can't find engine/server.js."
+    echo "Please do this command from the directory you have set up."
+    echo "If you have not set up, do \"bitter setup\" first."
+    exit 1
+  fi
+}
+
+if [ "$1" = "setup" ]; then
+  setup
+elif [ "$1" = "server" ]; then
+  server
+else
+  echo "Valid arguments are: setup, server"
+  exit 1
+fi

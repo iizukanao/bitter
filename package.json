@@ -1,10 +1,11 @@
 {
   "name": "bitter",
-  "version": "0.1.0",
+  "preferGlobal": true,
+  "version": "0.1.1",
   "author": "Nao Iizuka <iizuka@kyu-mu.net>",
   "description": "Minimal blog engine",
-  "scripts": {
-    "start": "node server.js"
+  "bin": {
+    "bitter": "bin/bitter"
   },
   "repository": {
     "type": "git",
