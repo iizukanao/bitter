@@ -510,7 +510,7 @@ app.get '/', (req, res) ->
     mkdir -p 2013/05
     echo "# Test\\n\\nHello World" > 2013/05/27-test.md
     git add .
-    git commit -m "Add an entry"
+    git commit -m "add test entry"
     git push
 
     Finished? Then reload this page slowly.
