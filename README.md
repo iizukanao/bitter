@@ -1,4 +1,4 @@
-## Bitter - minimal blog engine
+## Bitter - a minimal blog engine
 
 Waste everything but Git and Markdown
 
