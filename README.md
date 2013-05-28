@@ -2,7 +2,7 @@
 
 Waste everything but Git and Markdown
 
-[Example](http://notes.kyu-mu.net/2013/05/27/markdown_example)
+[Demo](http://notes.kyu-mu.net/2013/05/27/markdown_example) (in other words, my blog)
 
 ### Requirements
 
@@ -11,7 +11,7 @@ Waste everything but Git and Markdown
 
 ### Install
 
-On the server side:
+On the server side, do as follows. Replace "blogdir" with your desired directory.
 
     $ npm install -g bitter
     $ mkdir blogdir
@@ -22,7 +22,7 @@ Then start the server.
 
     $ PORT=1341 bitter server
 
-On the client side:
+On the client side, clone notes.git:
 
     $ git clone user@host:blogdir/notes.git
 
