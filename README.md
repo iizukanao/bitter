@@ -1,6 +1,6 @@
 ## Bitter - a minimal blog engine
 
-Waste everything but Git and Markdown
+_Waste everything but Git and Markdown_
 
 [Demo](http://notes.kyu-mu.net/2013/05/27/markdown_example) (in other words, my blog)
 
