@@ -17,6 +17,9 @@ On the server side:
     $ mkdir blogdir
     $ cd blogdir
     $ bitter setup
+
+Then start the server.
+
     $ PORT=1341 bitter server
 
 On the client side:
@@ -25,7 +28,7 @@ On the client side:
 
 ### To post an entry
 
-On the client side:
+In the cloned repository on the client side:
 
     $ mkdir -p 2013/05
     $ echo "# Test\n\nHello World" > 2013/05/27-test.md
@@ -33,7 +36,7 @@ On the client side:
     $ git commit -m "add test entry"
     $ git push
 
-### To edit an entry
+### To edit an existing entry
 
     $ vim 2013/05/27-test.md
     $ git add -u
