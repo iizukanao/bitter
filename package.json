@@ -1,7 +1,7 @@
 {
   "name": "bitter",
   "preferGlobal": true,
-  "version": "0.1.7",
+  "version": "0.1.8",
   "author": "Nao Iizuka <iizuka@kyu-mu.net>",
   "description": "Minimal blog engine for Git and Markdown enthusiasts",
   "bin": {
