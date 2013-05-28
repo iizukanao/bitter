@@ -1,5 +1,7 @@
 #!/bin/sh
 
+VERSION=0.1.8
+
 setup () {
   if [ -e engine/setup.sh ]; then
     echo "It appears you already have set up."
@@ -31,11 +33,27 @@ server () {
   fi
 }
 
+help () {
+  cat <<EOF
+usage: bitter <command>
+Bitter version $VERSION
+
+Commands are:
+   setup     Set up new repository
+   server    Start server
+   version   Show Bitter version
+EOF
+}
+
 if [ "$1" = "setup" ]; then
   setup
 elif [ "$1" = "server" ]; then
   server
+elif [ "$1" = "version" ]; then
+  echo "$VERSION"
+elif [ "$1" = "help" ]; then
+  help
 else
-  echo "Valid arguments are: setup, server"
+  help
   exit 1
 fi
