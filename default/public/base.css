@@ -1,0 +1,159 @@
+@charset "UTF-8";
+
+body {
+  margin: 1em auto 2em auto;
+  width: 70%;
+  max-width: 700px;
+  color: #000;
+  font-size: 20px;
+  font-family: Times, "Times New Roman", "Hiragino Mincho ProN", "IPA P明朝", "IPAPMincho", serif;
+  line-height: 1.6;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 0 auto 1.2em auto;
+  padding-top: 1.2em;
+}
+
+h1 {
+  font-size: 140%;
+}
+
+h2 {
+  font-size: 120%;
+}
+
+h3 {
+  font-size: 100%;
+}
+
+h4 {
+  font-size: 90%;
+}
+
+h5 {
+  font-size: 80%;
+}
+
+h6 {
+  font-size: 70%;
+}
+
+a {
+  color: #4040c4;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+ul {
+  margin-bottom: 0;
+  list-style-type: square;
+}
+
+pre {
+  padding: 16px;
+  width: 95%;
+  overflow: auto;
+}
+
+code {
+  margin: 0 .1em;
+  padding: .1em .4em;
+}
+
+pre, code {
+  background-color: #f5f5f5;
+  font-family: Consolas, "Courier New", Monaco, monospace;
+  font-size: 18px;
+}
+
+pre code {
+  margin: 0;
+  padding: 0;
+}
+
+blockquote {
+  font-style: italic;
+}
+
+table {
+  margin: 1.2em auto;
+  width: 70%;
+  border-collapse: collapse;
+}
+
+th, td {
+  border: 1px solid #999;
+  padding: 6px 10px;
+  color: #333;
+}
+
+p {
+  margin-bottom: 0;
+}
+
+div#header {
+  margin-bottom: 1em;
+  font-size: 14px;
+}
+
+div#header a {
+  margin-right: .5em;
+}
+
+div.date a {
+  margin-top: 1.5em;
+  color: #505050;
+  font-size: 14px;
+}
+
+.title {
+  margin: .6em auto;
+  padding-top: 0;
+}
+
+.title a {
+  color: #000;
+}
+
+.anchor a {
+  color: #000;
+}
+
+div#content {
+  margin-bottom: 2.3em;
+}
+
+div#content img {
+  max-width: 100%;
+}
+
+div.author {
+  color: #505050;
+  font-style: italic;
+  font-size: 14px;
+}
+
+div.powered-by {
+  color: #505050;
+  font-style: italic;
+  font-size: 14px;
+}
+
+@media only screen and (max-width: 640px) {
+  body {
+    margin: .5em .5em 2em .5em;
+    width: 95%;
+  }
+
+  table {
+    width: 80%;
+  }
+
+  pre {
+    width: 90%;
+  }
+}

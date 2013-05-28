@@ -11,9 +11,10 @@ setup () {
   script_dir=$(cd $which_dir/$link_dir; pwd -P)
 
   mkdir engine
-  cp $script_dir/../setup.sh engine/setup.sh
-  cp $script_dir/../server.js engine/server.js
-  ln -s $script_dir/../node_modules engine/node_modules
+  cp $script_dir/../setup.sh engine/
+  cp $script_dir/../server.js engine/
+  cp -R $script_dir/../default engine/
+  ln -s $script_dir/../node_modules engine/
 
   cd engine
   ./setup.sh
