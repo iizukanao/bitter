@@ -27,10 +27,54 @@ server () {
     node engine/server.js
   else
     echo "Can't find engine/server.js."
-    echo "Please do this command from the directory you have set up."
+    echo "Do this command from the directory you have set up."
     echo "If you have not set up, do \"bitter setup\" first."
     exit 1
   fi
+}
+
+gitconfig () {
+  if [ ! -e HEAD ]; then
+    echo "Do this command in bare .git directory"
+    exit 1
+  fi
+
+  if [ -e ../notes ]; then
+    while true; do
+      read -p "../notes exists, do you want to delete it? [y/N]" yn
+      case $yn in
+        [Yy]* ) break;;
+        [Nn]* ) echo "canceled."; exit 1;;
+        "" ) echo "canceled."; exit 1;;
+        * )  echo "Please answer yes or no.";;
+      esac
+    done
+    rm -rf ../notes
+  fi
+  mkdir ../notes
+  echo "created ../notes for worktree"
+
+  git config core.bare false
+  git config core.worktree ../notes
+  git config receive.denycurrentbranch ignore
+
+  # Arrange hook for post-receive event
+  if [ ! -e hooks/post-receive ]; then
+    echo "#!/bin/sh" > hooks/post-receive
+  fi
+  if ! grep --quiet "# Bitter" hooks/post-receive; then
+    cat >> hooks/post-receive <<EOF
+
+# Bitter
+git checkout -f
+touch ../engine/reindex-needed
+EOF
+  fi
+  chmod +x hooks/post-receive
+
+  git checkout -f
+
+  echo "successfully configured"
 }
 
 help () {
@@ -39,9 +83,10 @@ usage: bitter <command>
 Bitter version $VERSION
 
 Commands are:
-   setup     Set up new repository
-   server    Start server
-   version   Show Bitter version
+   setup      Set up new repository
+   server     Start server
+   gitconfig  Configure existing bare .git
+   version    Show Bitter version
 EOF
 }
 
@@ -49,6 +94,8 @@ if [ "$1" = "setup" ]; then
   setup
 elif [ "$1" = "server" ]; then
   server
+elif [ "$1" = "gitconfig" ]; then
+  gitconfig
 elif [ "$1" = "version" ]; then
   echo "$VERSION"
 elif [ "$1" = "help" ]; then
