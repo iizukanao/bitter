@@ -4,6 +4,14 @@ _Waste everything but Git and Markdown_
 
 [Demo](http://notes.kyu-mu.net/2013/05/27/markdown_example) (in other words, my blog)
 
+### Features
+
+- Publish article by "git push"
+- Write article in Markdown
+- Suitable for text content
+- Pure Node.js server
+- Simple code base that you can easily hack on
+
 ### Requirements
 
 - Node.js v0.10.4 or later
