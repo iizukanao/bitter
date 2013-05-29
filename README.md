@@ -18,17 +18,17 @@ On the server side, do as follows. Replace "blogdir" with your desired directory
     $ cd blogdir
     $ bitter setup
 
-Then start the server.
+Then start the server. Specify listen port with environment variable PORT.
 
     $ PORT=1341 bitter server
 
-On the client side, clone notes.git:
+On the client side, clone blogdir/notes.git.
 
     $ git clone user@host:blogdir/notes.git
 
 ### To post an entry
 
-In the cloned repository on the client side:
+In the cloned repository on the local machine, write an article in Markdown, then save it as `year/month/date-slug.md`. Do `git push` to publish it.
 
     $ mkdir -p 2013/05
     $ echo "# Test\n\nHello World" > 2013/05/27-test.md
