@@ -163,6 +163,19 @@ findTitleFromLex = (lex) ->
       return component.text
   null
 
+convertToAbsoluteLinks = (html, params) ->
+  html = html.replace /(<a href|<img src)="(.*?)"/g, (match, p1, p2) ->
+    p2 = p2.replace /^\.\.\/(?!\.\.)/g, "/#{params.year}/#{params.month}/"
+    p2 = p2.replace /^\.\.\/\.\.\/(?!\.\.)/g, "/#{params.year}/"
+    p2 = p2.replace /^\.\.\/\.\.\/\.\.\/(?!\.\.)/g, "/"
+    if p2.indexOf('://') is -1
+      if p2[0] isnt '/'
+        p2 = "/#{params.year}/#{params.month}/#{params.date}/#{p2}"
+      if params.absoluteURL
+        p2 = "#{config.siteURL}#{p2}"
+    "#{p1}=\"#{p2}\""
+  html
+
 # Format Markdown content into HTML
 formatPage = (input, callback) ->
   lex = marked.Lexer.lex(input.markdown)
@@ -177,6 +190,9 @@ formatPage = (input, callback) ->
     title = '(untitled)'
 
   body = marked.Parser.parse(lex)
+  # Convert relative links to absolute
+  if input.absolutePath or input.absoluteURL
+    body = convertToAbsoluteLinks body, input
 
   # Date
   if input.year? and input.month? and input.date?
@@ -469,6 +485,12 @@ app.get '/index.atom', (req, res) ->
   <updated>#{new Date(recentInfo.generatedTime).toISOString()}</updated>
   """
   for file in recentInfo.recentFiles
+    html = convertToAbsoluteLinks file.body, {
+      year       : file.year
+      month      : file.month
+      date       : file.date
+      absoluteURL: true
+    }
     entryUrl = "#{config.siteURL}/#{file.year}/#{file.month}/#{file.datepart}/#{file.slug}"
     title = file.title
     if (not title?) or (title is '')
@@ -479,7 +501,7 @@ app.get '/index.atom', (req, res) ->
     <link href="#{entryUrl}" />
     <id>#{entryUrl}</id>
     <updated>#{new Date(file.time).toISOString()}</updated>
-    <content type="html">#{escapeTags file.body}</content>
+    <content type="html">#{escapeTags html}</content>
     <author>
       <name>#{escapeTags config.authorName}</name>
       <uri>#{escapeTags config.authorLink}</uri>
@@ -524,12 +546,13 @@ app.get '/', (req, res) ->
       return
     url = "/#{file.year}/#{file.month}/#{file.datepart}/#{file.slug}"
     formatPage {
-      markdown: markdown
-      link    : url
-      year    : file.year
-      month   : file.month
-      date    : file.date
-      noTitle : true
+      markdown    : markdown
+      link        : url
+      year        : file.year
+      month       : file.month
+      date        : file.date
+      noTitle     : true
+      absolutePath: true
     }, (err, html) ->
       if err
         logMessage err
