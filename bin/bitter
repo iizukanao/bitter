@@ -1,6 +1,6 @@
 #!/bin/sh
 
-VERSION=0.1.10
+VERSION=0.2.0
 
 get_script_dir () {
   script_dir="$(dirname $(test -L "$0" && readlink "$0" || echo "$0"))"
