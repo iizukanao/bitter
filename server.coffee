@@ -5,7 +5,7 @@ marked  = require 'marked'
 express = require 'express'
 
 # Base directory of entries
-basedir = path.normalize "#{__dirname}/../notes"
+basedir = path.normalize "#{process.cwd()}/notes"
 
 # Port to listen
 PORT = parseInt process.env.PORT
@@ -20,7 +20,7 @@ pageTemplateFilename = "#{basedir}/config/page.ejs"
 
 # If this file will be created,
 # the index is needed to be generated again.
-reindexCheckFilename = "#{__dirname}/reindex-needed"
+reindexCheckFilename = "#{basedir}/reindex-needed"
 
 monthNames = [
   'January', 'February', 'March', 'April', 'May', 'June',
