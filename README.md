@@ -42,17 +42,17 @@ In the cloned repository on the local machine, write an article in Markdown, the
     $ echo "# Test\n\nHello World" > 2013/05/27-test.md
     $ git add .
     $ git commit -m "add test entry"
-    $ git push
+    $ git push origin master
 
 ### To edit an existing entry
 
     $ vim 2013/05/27-test.md
     $ git add -u
     $ git commit -m update
-    $ git push
+    $ git push origin master
 
 ### To delete an entry
 
     $ git rm 2013/05/27-test.md
     $ git commit -m delete
-    $ git push
+    $ git push origin master

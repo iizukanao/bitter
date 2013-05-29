@@ -511,7 +511,7 @@ app.get '/', (req, res) ->
     echo "# Test\\n\\nHello World" > 2013/05/27-test.md
     git add .
     git commit -m "add test entry"
-    git push
+    git push origin master
 
     Finished? Then reload this page slowly.
     """
