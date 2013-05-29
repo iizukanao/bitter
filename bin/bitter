@@ -1,6 +1,6 @@
 #!/bin/sh
 
-VERSION=0.1.9
+VERSION=0.1.10
 
 setup () {
   if [ -e engine/setup.sh ]; then
