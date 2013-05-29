@@ -3,7 +3,15 @@
 VERSION=0.2.0
 
 get_script_dir () {
-  script_dir="$(dirname $(test -L "$0" && readlink "$0" || echo "$0"))"
+  bin_dir=$(dirname $0)
+  link_dir="$(dirname $(test -L "$0" && readlink "$0" || echo "$0"))"
+  if [ "$bin_dir" = "$link_dir" ]; then
+    script_dir="$bin_dir"
+  elif [[ "$link_dir" = /* ]]; then
+    script_dir="$link_dir"
+  else
+    script_dir="$(cd $bin_dir/$link_dir; pwd -P)"
+  fi
   echo "$script_dir"
 }
 
