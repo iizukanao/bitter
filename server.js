@@ -12,7 +12,7 @@
 
   express = require('express');
 
-  basedir = path.normalize("" + __dirname + "/../notes");
+  basedir = path.normalize("" + (process.cwd()) + "/notes");
 
   PORT = parseInt(process.env.PORT);
 
@@ -24,7 +24,7 @@
 
   pageTemplateFilename = "" + basedir + "/config/page.ejs";
 
-  reindexCheckFilename = "" + __dirname + "/reindex-needed";
+  reindexCheckFilename = "" + basedir + "/reindex-needed";
 
   monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
