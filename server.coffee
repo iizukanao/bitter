@@ -18,7 +18,7 @@ configFilename = "#{basedir}/config/config.json"
 # EJS template for formatting pages
 pageTemplateFilename = "#{basedir}/config/page.ejs"
 
-# If this file will be created,
+# Existence of this file means that
 # the index is needed to be generated again.
 reindexCheckFilename = "#{basedir}/reindex-needed"
 
@@ -30,6 +30,7 @@ monthNames = [
 formatDate = (year, month, date) ->
   "#{monthNames[month-1]} #{date}, #{year}"
 
+# config.json is loaded to this variable
 config = null
 
 app = express()
@@ -51,6 +52,7 @@ if not fs.existsSync configFilename
   console.log "#{configFilename} does not exist"
   process.exit 1
 
+# Log message to stdout
 logMessage = (str, opts) ->
   buf = ''
   if not opts?.noTime
@@ -77,7 +79,7 @@ loadConfig = ->
     return e
   config.siteURL = config.siteURL.replace /\/$/, ''
   config.authorEmail = obfuscateEmail config.authorEmail
-  null
+  null  # no error
 
 err = loadConfig()
 if err?
@@ -86,6 +88,7 @@ if err?
 # Object for storing index
 recentInfo = {}
 
+# Markdown formatting options
 marked.setOptions
   gfm       : true
   tables    : true
@@ -157,12 +160,22 @@ respondWithNotFound = (res) ->
     res.setHeader 'Content-Type', 'text/html; charset=utf-8'
     res.send 404, html
 
+# Find first heading from lex object
 findTitleFromLex = (lex) ->
   for component in lex
     if component.type is 'heading'
       return component.text
-  null
+  null  # not found
 
+# Convert links in HTML to absolute URL
+#   html (string): HTML
+#   params: {
+#     year  (string): entry's year
+#     month (string): entry's month
+#     date  (string): entry's date
+#     absoluteURL (boolean): If true, prepend config.siteURL
+#                            If false, start with /
+#   }
 convertToAbsoluteLinks = (html, params) ->
   html = html.replace /(<a href|<img src)="(.*?)"/g, (match, p1, p2) ->
     p2 = p2.replace /^\.\.\/(?!\.\.)/g, "/#{params.year}/#{params.month}/"
@@ -387,7 +400,7 @@ app.get '/archives', (req, res) ->
     res.setHeader 'Content-Type', 'text/html; charset=utf-8'
     res.send html
 
-# Archives for a year
+# Archives for a year (e.g. /2013/)
 app.get /^\/(\d{4})\/?$/, (req, res) ->
   year = req.params[0]
   months = listMonths year
@@ -409,7 +422,7 @@ app.get /^\/(\d{4})\/?$/, (req, res) ->
     res.setHeader 'Content-Type', 'text/html; charset=utf-8'
     res.send html
 
-# Archives for a month
+# Archives for a month (e.g. /2013/05/)
 app.get /^\/(\d{4})\/(\d{2})\/?$/, (req, res) ->
   year = req.params[0]
   month = req.params[1]
