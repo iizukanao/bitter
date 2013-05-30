@@ -30,7 +30,7 @@ Then start the server. Specify listen port with environment variable PORT.
 
     $ PORT=1341 bitter server
 
-On the client side, clone blogdir/notes.git.
+On the local machine, clone blogdir/notes.git.
 
     $ git clone user@host:blogdir/notes.git
 
