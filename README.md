@@ -56,3 +56,13 @@ In the cloned repository on the local machine, write an article in Markdown, the
     $ git rm 2013/05/27-test.md
     $ git commit -m delete
     $ git push origin master
+
+### To embed static files
+
+Put your static files under the directory that entry resides. Those files can be referred to by relative path. For example, to embed 2013/05/images/winter.jpg, write following code in 2013/05/27-test.md.
+
+    ![Winter photo](images/winter.jpg)
+
+If you put static files under "public" directory, those files can be referred to by absolute path. For example, to embed public/images/spring.jpg:
+
+    ![Spring photo](/images/spring.jpg)
