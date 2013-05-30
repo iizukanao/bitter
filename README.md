@@ -6,8 +6,8 @@ _Waste everything but Git and Markdown_
 
 ### Features
 
-- Publish article by "git push"
-- Write article in Markdown
+- Publish entry by "git push"
+- Write entry in Markdown
 - Suitable for text content
 - Pure Node.js server
 - Simple code base that you can easily hack on
@@ -36,7 +36,7 @@ On the client side, clone blogdir/notes.git.
 
 ### To post an entry
 
-In the cloned repository on the local machine, write an article in Markdown, then save it as `year/month/date-slug.md`. Do `git push` to publish it.
+In the cloned repository on the local machine, write an entry in Markdown with your favorite editor, then save it as `year/month/date-slug.md`. Do `git push` to publish it.
 
     $ mkdir -p 2013/05
     $ echo "# Test\n\nHello World" > 2013/05/27-test.md
@@ -46,12 +46,16 @@ In the cloned repository on the local machine, write an article in Markdown, the
 
 ### To edit an existing entry
 
+On the local machine:
+
     $ vim 2013/05/27-test.md
     $ git add -u
     $ git commit -m update
     $ git push origin master
 
 ### To delete an entry
+
+On the local machine:
 
     $ git rm 2013/05/27-test.md
     $ git commit -m delete
