@@ -87,6 +87,8 @@ cd to notes.git, and do "bitter gitconfig".
 
     $ cd notes.git
     $ bitter gitconfig
+    created ../notes for worktree
+    successfully configured
 
 Now notes directory has set up automatically.
 
