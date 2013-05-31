@@ -99,5 +99,7 @@ Now notes directory has set up automatically.
 Run the server.
 
     $ PORT=1341 bitter server
+    [Sat Jun 01 2013 05:48:08] indexing...done (10 ms)
+    [Sat Jun 01 2013 05:48:08] Server started on port 1341
 
 Visit http://localhost:1341/ with browser.
