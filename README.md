@@ -70,3 +70,32 @@ Put your static files under the directory that entry resides. Those files can be
 If you put static files under "public" directory, those files can be referred to by absolute path. For example, to embed public/images/spring.jpg:
 
     ![Spring photo](/images/spring.jpg)
+
+### To view entry on your local machine
+
+First, install Bitter on your local machine.
+
+    $ npm install -g bitter
+
+Then clone notes.git from server.
+
+    $ mkdir localblogdir
+    $ cd localblogdir
+    $ git clone --bare user@host:blogdir/notes.git
+
+cd to notes.git, and do "bitter gitconfig".
+
+    $ cd notes.git
+    $ bitter gitconfig
+
+Now notes directory has set up automatically.
+
+    $ cd ..
+    $ ls
+    $ notes notes.git
+
+Run the server.
+
+    $ PORT=1341 bitter server
+
+Visit http://localhost:1341/ with browser.
