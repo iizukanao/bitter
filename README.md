@@ -102,4 +102,4 @@ Run the server.
     [Sat Jun 01 2013 05:48:08] indexing...done (10 ms)
     [Sat Jun 01 2013 05:48:08] Server started on port 1341
 
-Visit [http://localhost:1341/](http://localhost:1341/) with browser.
+Open [http://localhost:1341/](http://localhost:1341/) with a browser.
