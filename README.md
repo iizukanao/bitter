@@ -77,7 +77,7 @@ First, install Bitter on your local machine.
 
     $ npm install -g bitter
 
-Then clone notes.git from server.
+Then clone notes.git from server as bare repository.
 
     $ mkdir localblogdir
     $ cd localblogdir
