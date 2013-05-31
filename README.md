@@ -94,7 +94,7 @@ Now notes directory has set up automatically.
 
     $ cd ..
     $ ls
-    $ notes notes.git
+    notes notes.git
 
 Run the server.
 
