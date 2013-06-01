@@ -125,11 +125,11 @@ Create a branch for a draft in your repository.
     $ cd localblogdir/notes
     $ git checkout -b draft
 
-    (Do some commits)
+Do some commits, then push that branch to local.
 
     $ git push local
 
-Also checkout that branch in localblogdir/notes.git.
+Also checkout the branch in localblogdir/notes.git.
 
     $ cd localblogdir/notes.git
     $ git checkout draft
