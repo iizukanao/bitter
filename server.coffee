@@ -28,7 +28,7 @@ monthNames = [
 ]
 
 formatDate = (year, month, date) ->
-  "#{monthNames[month-1]} #{date}, #{year}"
+  "#{monthNames[month-1]} #{parseInt date}, #{year}"
 
 # config.json is loaded to this variable
 config = null
