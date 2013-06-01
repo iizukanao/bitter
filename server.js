@@ -105,6 +105,10 @@
     langPrefix: 'lang-'
   });
 
+  if (fs.existsSync(reindexCheckFilename)) {
+    fs.unlink(reindexCheckFilename);
+  }
+
   fs.watchFile(reindexCheckFilename, function(curr, prev) {
     if (curr.nlink > 0) {
       return fs.unlink(reindexCheckFilename, function() {
