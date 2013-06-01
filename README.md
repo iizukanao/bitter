@@ -84,7 +84,7 @@ Then clone notes.git from server as bare repository.
     $ cd localblogdir
     $ git clone --bare user@host:blogdir/notes.git
 
-cd to notes.git, and do "bitter gitconfig".
+cd to notes.git, and do `bitter gitconfig`.
 
     $ cd notes.git
     $ bitter gitconfig
@@ -110,7 +110,7 @@ Then add that local repository as remote.
     $ cd localclone/notes
     $ git remote add local ~/localblogdir/notes.git
 
-After you commit some changes in localclone/notes, do "git push local master" to apply it to local machine, and do "git push origin master" to apply it to the server.
+After you commit some changes in localclone/notes, do `git push local master` to apply it to local machine, and do `git push origin master` to apply it to the server.
 
     $ git push local master
     (Now commits are applied to local machine)
