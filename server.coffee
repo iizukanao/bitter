@@ -98,6 +98,9 @@ marked.setOptions
   smartLists: true
   langPrefix: 'lang-'
 
+if fs.existsSync reindexCheckFilename
+  fs.unlink reindexCheckFilename
+
 # Watch reindex-needed to be created
 fs.watchFile reindexCheckFilename, (curr, prev) ->
   if curr.nlink > 0
