@@ -32,7 +32,8 @@ Then start the server. Specify listen port with environment variable PORT.
 
 On the local machine, clone blogdir/notes.git.
 
-    $ git clone user@host:blogdir/notes.git
+    $ mkdir localclone
+    $ git clone user@host:blogdir/notes.git localclone/notes
 
 ### To post an entry
 
@@ -103,3 +104,16 @@ Run the server.
     [Sat Jun 01 2013 05:48:08] Server started on port 1341
 
 Open [http://localhost:1341/](http://localhost:1341/) with a browser.
+
+Then add that local repository as remote.
+
+    $ cd localclone/notes
+    $ git remote add local ~/localblogdir/notes.git
+
+If you commit some changes in localclone/notes, "git push local master" to apply it on local machine, "git push origin master" to apply it on the server.
+
+    $ git push local master
+    (Now commits are applied to local machine)
+
+    $ git push origin master
+    (Now commits are applied to the server)
