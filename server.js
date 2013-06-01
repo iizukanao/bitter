@@ -29,7 +29,7 @@
   monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
   formatDate = function(year, month, date) {
-    return "" + monthNames[month - 1] + " " + date + ", " + year;
+    return "" + monthNames[month - 1] + " " + (parseInt(date)) + ", " + year;
   };
 
   config = null;
