@@ -122,7 +122,7 @@ After you commit some changes in localclone/notes, do `git push local master` to
 
 Create a branch for a draft in your repository.
 
-    $ cd localblogdir/notes
+    $ cd localclone/notes
     $ git checkout -b draft
 
 Do some commits, then push that branch to local.
