@@ -117,3 +117,24 @@ After you commit some changes in localclone/notes, do `git push local master` to
 
     $ git push origin master
     (Now commits are applied to the server)
+
+### To write and preview a draft on local machine
+
+Create a branch for a draft in your repository.
+
+    $ cd localblogdir/notes
+    $ git checkout -b draft
+
+    (Do some commits)
+
+    $ git push local
+
+Also checkout that branch in localblogdir/notes.git.
+
+    $ cd localblogdir/notes.git
+    $ git checkout draft
+
+After changing branch, restart `bitter server`.
+
+    $ cd ..
+    $ PORT=1341 bitter server
