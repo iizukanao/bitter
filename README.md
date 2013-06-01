@@ -72,9 +72,9 @@ If you put static files under "public" directory, those files can be referred to
 
     ![Spring photo](/images/spring.jpg)
 
-### To view entry on your local machine
+### To view entry on local machine
 
-First, install Bitter on your local machine.
+First, install Bitter on local machine.
 
     $ npm install -g bitter
 
