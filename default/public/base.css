@@ -62,6 +62,7 @@ pre {
 code {
   margin: 0 .1em;
   padding: .1em .4em;
+  white-space: pre;
 }
 
 pre, code {
