@@ -81,8 +81,7 @@ First, install Bitter on local machine.
 Then clone notes.git from server as bare repository.
 
     $ mkdir localblogdir
-    $ cd localblogdir
-    $ git clone --bare user@host:blogdir/notes.git
+    $ git clone --bare user@host:blogdir/notes.git localblogdir/notes.git
 
 cd to notes.git, and do `bitter gitconfig`.
 
