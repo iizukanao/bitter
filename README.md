@@ -133,8 +133,3 @@ Also checkout the branch in localblogdir/notes.git.
 
     $ cd localblogdir/notes.git
     $ git checkout draft
-
-After changing branch, restart `bitter server`.
-
-    $ cd ..
-    $ PORT=1341 bitter server
