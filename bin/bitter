@@ -29,10 +29,22 @@ configure_notes_git () {
 
 # Bitter
 git checkout -f
-touch ../notes/reindex-needed
 EOF
   fi
   chmod +x hooks/post-receive
+
+  # Arrange hook for post-checkout event
+  if [ ! -e hooks/post-checkout ]; then
+    echo "#!/bin/sh" > hooks/post-checkout
+  fi
+  if ! grep --quiet "# Bitter" hooks/post-checkout; then
+    cat >> hooks/post-checkout <<EOF
+
+# Bitter
+touch ../notes/reindex-needed
+EOF
+  fi
+  chmod +x hooks/post-checkout
 }
 
 setup () {
