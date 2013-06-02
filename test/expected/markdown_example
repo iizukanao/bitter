@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>Markdown Example | MyLittleNotes</title>
+  <link rel="alternate" type="application/atom+xml" href="http://notes.kyu-mu.net/index.atom">
+  <link rel="stylesheet" href="/base.css">
+</head>
+<body>
+<div id="header">
+  <a href="/">MyLittleNotes</a>
+  <a href="/recents">Recent entries</a>
+  <a href="/index.atom">Feed</a>
+</div>
+<div id="content">
+<div class="date"><a href="/2013/05/27/markdown_example">May 27, 2013</a></div>
+<h1 class="title"><a href="/2013/05/27/markdown_example">Markdown Example</a></h1>
+<p>This blog is powered by <a href="../29/introducing_bitter_blog_engine">Bitter</a>.<br>You can use <a href="https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet">Github Flavored Markdown</a>.</p>
+<h2 class="anchor" id="heading_1"><a href="#heading_1">Heading</a></h2>
+<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+<ul>
+<li>Item 1<ul>
+<li>Item 1-1</li>
+<li>Item 1-2</li>
+</ul>
+</li>
+<li>Item 2</li>
+<li>Item 3</li>
+</ul>
+<p>Here is the code.</p>
+<pre><code>console.log &quot;hello&quot;
+setTimeout -&gt;
+  console.log &quot;world&quot;
+, 1000</code></pre>
+<blockquote>
+<p>This is a blockquote.</p>
+</blockquote>
+<hr>
+<h3 class="anchor" id="heading_2"><a href="#heading_2">Tables</a></h3>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th align="right">Price</th>
+<th align="right">Quantity</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Coffee</td>
+<td align="right">$1.49</td>
+<td align="right">2</td>
+</tr>
+<tr>
+<td>Tea</td>
+<td align="right">$1.39</td>
+<td align="right">1</td>
+</tr>
+<tr>
+<td>Cake</td>
+<td align="right">$2.99</td>
+<td align="right">3</td>
+</tr>
+</tbody>
+</table>
+<h3 class="anchor" id="heading_3"><a href="#heading_3">Images</a></h3>
+<p>You can embed images like this.</p>
+<p><img src="images/winter.jpg" alt="Winter"></p>
+<p>Using this code:</p>
+<pre><code>![Winter](images/winter.jpg)</code></pre>
+</div>
+<div class="author">Posted by <a href="http://kyu-mu.net/">Nao Iizuka</a></div><div class="powered-by">
+  Powered by <a href="http://notes.kyu-mu.net/2013/05/29/introducing_bitter_blog_engine">Bitter</a>
+</div>
+</body>
+</html>

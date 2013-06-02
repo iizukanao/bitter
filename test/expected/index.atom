@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+<title>MyLittleNotes</title>
+<link href="http://notes.kyu-mu.net/index.atom" rel="self" />
+<link href="http://notes.kyu-mu.net" />
+<id>http://notes.kyu-mu.net/</id>
+<updated>2013-06-02T12:14:41.504Z</updated><entry>
+  <title>Bitter blog engine</title>
+  <link href="http://notes.kyu-mu.net/2013/05/29/introducing_bitter_blog_engine" />
+  <id>http://notes.kyu-mu.net/2013/05/29/introducing_bitter_blog_engine</id>
+  <updated>2013-05-28T15:00:00.000Z</updated>
+  <content type="html">&lt;h1&gt;Bitter blog engine&lt;/h1&gt;
+&lt;p&gt;&lt;span style=&quot;font-size:80%&quot;&gt;&lt;a href=&quot;http://notes.kyu-mu.net/2013/05/28/blog_engine_bitter&quot;&gt;Japanese version（日本語の説明はこちら）&lt;/a&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Minimal blog engine for Git and Markdown enthusiasts&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;I made a new blog engine &amp;quot;Bitter&amp;quot;. The main features are:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Publish article by &amp;quot;git push&amp;quot;&lt;/li&gt;
+&lt;li&gt;Write article in Markdown&lt;/li&gt;
+&lt;li&gt;Suitable for text content&lt;/li&gt;
+&lt;li&gt;Pure Node.js server&lt;/li&gt;
+&lt;li&gt;Simple code base that you can easily hack on&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;Source code&lt;/h2&gt;
+&lt;p&gt;The repository is on &lt;a href=&quot;https://github.com/iizukanao/bitter&quot;&gt;GitHub&lt;/a&gt;. Pull requests are welcome.&lt;/p&gt;
+&lt;h2&gt;Install&lt;/h2&gt;
+&lt;p&gt;On the server side, do as follows. Please replace &amp;quot;blogdir&amp;quot; with your desired directory.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ npm install -g bitter
+$ mkdir blogdir
+$ cd blogdir
+$ bitter setup&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;After setup completed, run the server. Specify listen port with environment variable PORT.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ PORT=1341 bitter server&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;If you&amp;#39;re going to use with nginx or Apache, configure them to use reverse proxy.&lt;/p&gt;
+&lt;p&gt;On the local machine, clone blogdir/notes.git.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ git clone user@host:blogdir/notes.git&lt;/code&gt;&lt;/pre&gt;
+&lt;h2&gt;To post an entry&lt;/h2&gt;
+&lt;p&gt;In the cloned repository on the local machine, write an article in Markdown, then save it as &lt;code&gt;year/month/date-slug.md&lt;/code&gt;. Do &lt;code&gt;git push&lt;/code&gt; to publish it.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ mkdir -p 2013/05
+$ echo &amp;quot;# Test\n\nHello World&amp;quot; &amp;gt; 2013/05/27-test.md
+$ git add .
+$ git commit -m &amp;quot;add test entry&amp;quot;
+$ git push origin master&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Commit message has no effect on Bitter.&lt;/p&gt;
+&lt;h2&gt;To edit an existing entry&lt;/h2&gt;
+&lt;pre&gt;&lt;code&gt;$ vim 2013/05/27-test.md
+$ git add -u
+$ git commit -m update
+$ git push origin master&lt;/code&gt;&lt;/pre&gt;
+&lt;h2&gt;To delete an entry&lt;/h2&gt;
+&lt;pre&gt;&lt;code&gt;$ git rm 2013/05/27-test.md
+$ git commit -m delete
+$ git push origin master&lt;/code&gt;&lt;/pre&gt;
+&lt;h2&gt;To embed static files&lt;/h2&gt;
+&lt;p&gt;Put your static files under the directory that article resides. Those files can be referred to by relative path. For example, to embed 2013/05/images/winter.jpg, write following code in 2013/05/27-test.md.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;![Winter photo](images/winter.jpg)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;If you put static files under &amp;quot;public&amp;quot; directory, those files can be referred to by absolute path. For example, to embed public/images/spring.jpg:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;![Spring photo](/images/spring.jpg)&lt;/code&gt;&lt;/pre&gt;
+</content>
+  <author>
+    <name>Nao Iizuka</name>
+    <uri>http://kyu-mu.net/</uri>
+
+  </author>
+</entry><entry>
+  <title>ブログエンジンBitter</title>
+  <link href="http://notes.kyu-mu.net/2013/05/28/blog_engine_bitter" />
+  <id>http://notes.kyu-mu.net/2013/05/28/blog_engine_bitter</id>
+  <updated>2013-05-27T15:00:00.000Z</updated>
+  <content type="html">&lt;h2&gt;ブログエンジンBitter&lt;/h2&gt;
+&lt;p&gt;自分のブログ用に、新しいブログエンジン「Bitter」を作りました。このブログもBitterで動いています。&lt;/p&gt;
+&lt;h3&gt;特徴&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;ローカルからgit pushで投稿&lt;/li&gt;
+&lt;li&gt;Markdownで記述&lt;/li&gt;
+&lt;li&gt;サーバサイドはNode.jsで、Webサーバも兼ねる&lt;/li&gt;
+&lt;li&gt;文章主体のブログ向け&lt;/li&gt;
+&lt;li&gt;改造しやすいシンプルな構成&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3&gt;ソースコード&lt;/h3&gt;
+&lt;p&gt;&lt;a href=&quot;https://github.com/iizukanao/bitter&quot;&gt;GitHub&lt;/a&gt;にあります。Pull Requestも歓迎です。&lt;/p&gt;
+&lt;h3&gt;インストール&lt;/h3&gt;
+&lt;p&gt;サーバー側で下記のコマンドを入力します。blogdirは、ファイルを置くディレクトリとして読み替えてください。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ npm install -g bitter
+$ mkdir blogdir
+$ cd blogdir
+$ bitter setup&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;次のコマンドでサーバを起動します。環境変数PORTでポート番号を指定します。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ PORT=1341 bitter server&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;nginxやApacheと組み合わせて使う場合はリバースプロキシを使ってください。&lt;/p&gt;
+&lt;p&gt;ローカル側では、記事ディレクトリをcloneします。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ git clone user@host:blogdir/notes.git&lt;/code&gt;&lt;/pre&gt;
+&lt;h3&gt;記事を投稿する&lt;/h3&gt;
+&lt;p&gt;ローカルでcloneした記事ディレクトリ内で、&lt;code&gt;年/月/日-slug.md&lt;/code&gt;のようなファイル名でMarkdownを作成し、pushすると公開されます。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ mkdir -p 2013/05
+$ echo &amp;quot;# Test\n\nHello World&amp;quot; &amp;gt; 2013/05/27-test.md
+$ git add .
+$ git commit -m &amp;quot;add test entry&amp;quot;  # メッセージは何でもOK
+$ git push origin master&lt;/code&gt;&lt;/pre&gt;
+&lt;h3&gt;既存の記事を編集する&lt;/h3&gt;
+&lt;pre&gt;&lt;code&gt;$ vim 2013/05/27-test.md
+$ git add -u
+$ git commit -m update  # メッセージは何でもOK
+$ git push origin master&lt;/code&gt;&lt;/pre&gt;
+&lt;h3&gt;記事を削除する&lt;/h3&gt;
+&lt;pre&gt;&lt;code&gt;$ git rm 2013/05/27-test.md
+$ git commit -m delete  # メッセージは何でもOK
+$ git push origin master&lt;/code&gt;&lt;/pre&gt;
+&lt;h3&gt;画像を埋め込む&lt;/h3&gt;
+&lt;p&gt;記事と同じディレクトリ以下に画像ファイルを置くと、相対パスで参照できます。例えば、2013/05/images/winter.jpgを埋め込むには、2013/05/27-test.mdに次のように書きます。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;![Winter photo](images/winter.jpg)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;一方、publicディレクトリ以下にファイルを置くと、絶対パスで参照できます。例えば、public/images/spring.jpgを埋め込むには次のように書きます。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;![Spring photo](/images/spring.jpg)&lt;/code&gt;&lt;/pre&gt;
+</content>
+  <author>
+    <name>Nao Iizuka</name>
+    <uri>http://kyu-mu.net/</uri>
+
+  </author>
+</entry><entry>
+  <title>Markdown Example</title>
+  <link href="http://notes.kyu-mu.net/2013/05/27/markdown_example" />
+  <id>http://notes.kyu-mu.net/2013/05/27/markdown_example</id>
+  <updated>2013-05-26T15:00:00.000Z</updated>
+  <content type="html">&lt;h1&gt;Markdown Example&lt;/h1&gt;
+&lt;p&gt;This blog is powered by &lt;a href=&quot;http://notes.kyu-mu.net/2013/05/29/introducing_bitter_blog_engine&quot;&gt;Bitter&lt;/a&gt;.&lt;br&gt;You can use &lt;a href=&quot;https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet&quot;&gt;Github Flavored Markdown&lt;/a&gt;.&lt;/p&gt;
+&lt;h2&gt;Heading&lt;/h2&gt;
+&lt;p&gt;Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Item 1&lt;ul&gt;
+&lt;li&gt;Item 1-1&lt;/li&gt;
+&lt;li&gt;Item 1-2&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Item 2&lt;/li&gt;
+&lt;li&gt;Item 3&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Here is the code.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;console.log &amp;quot;hello&amp;quot;
+setTimeout -&amp;gt;
+  console.log &amp;quot;world&amp;quot;
+, 1000&lt;/code&gt;&lt;/pre&gt;
+&lt;blockquote&gt;
+&lt;p&gt;This is a blockquote.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;hr&gt;
+&lt;h3&gt;Tables&lt;/h3&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Item&lt;/th&gt;
+&lt;th align=&quot;right&quot;&gt;Price&lt;/th&gt;
+&lt;th align=&quot;right&quot;&gt;Quantity&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;Coffee&lt;/td&gt;
+&lt;td align=&quot;right&quot;&gt;$1.49&lt;/td&gt;
+&lt;td align=&quot;right&quot;&gt;2&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Tea&lt;/td&gt;
+&lt;td align=&quot;right&quot;&gt;$1.39&lt;/td&gt;
+&lt;td align=&quot;right&quot;&gt;1&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Cake&lt;/td&gt;
+&lt;td align=&quot;right&quot;&gt;$2.99&lt;/td&gt;
+&lt;td align=&quot;right&quot;&gt;3&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3&gt;Images&lt;/h3&gt;
+&lt;p&gt;You can embed images like this.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;http://notes.kyu-mu.net/2013/05/27/images/winter.jpg&quot; alt=&quot;Winter&quot;&gt;&lt;/p&gt;
+&lt;p&gt;Using this code:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;![Winter](images/winter.jpg)&lt;/code&gt;&lt;/pre&gt;
+</content>
+  <author>
+    <name>Nao Iizuka</name>
+    <uri>http://kyu-mu.net/</uri>
+
+  </author>
+</entry>
+</feed>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>Bitter blog engine | MyLittleNotes</title>
+  <link rel="alternate" type="application/atom+xml" href="http://notes.kyu-mu.net/index.atom">
+  <link rel="stylesheet" href="/base.css">
+</head>
+<body>
+<div id="header">
+  <a href="/">MyLittleNotes</a>
+  <a href="/recents">Recent entries</a>
+  <a href="/index.atom">Feed</a>
+</div>
+<div id="content">
+<div class="date"><a href="/2013/05/29/introducing_bitter_blog_engine">May 29, 2013</a></div>
+<h1 class="title"><a href="/2013/05/29/introducing_bitter_blog_engine">Bitter blog engine</a></h1>
+<p><span style="font-size:80%"><a href="../28/blog_engine_bitter">Japanese version（日本語の説明はこちら）</a></span></p>
+<p><em>Minimal blog engine for Git and Markdown enthusiasts</em></p>
+<p>I made a new blog engine &quot;Bitter&quot;. The main features are:</p>
+<ul>
+<li>Publish article by &quot;git push&quot;</li>
+<li>Write article in Markdown</li>
+<li>Suitable for text content</li>
+<li>Pure Node.js server</li>
+<li>Simple code base that you can easily hack on</li>
+</ul>
+<h2 class="anchor" id="heading_1"><a href="#heading_1">Source code</a></h2>
+<p>The repository is on <a href="https://github.com/iizukanao/bitter">GitHub</a>. Pull requests are welcome.</p>
+<h2 class="anchor" id="heading_2"><a href="#heading_2">Install</a></h2>
+<p>On the server side, do as follows. Please replace &quot;blogdir&quot; with your desired directory.</p>
+<pre><code>$ npm install -g bitter
+$ mkdir blogdir
+$ cd blogdir
+$ bitter setup</code></pre>
+<p>After setup completed, run the server. Specify listen port with environment variable PORT.</p>
+<pre><code>$ PORT=1341 bitter server</code></pre>
+<p>If you&#39;re going to use with nginx or Apache, configure them to use reverse proxy.</p>
+<p>On the local machine, clone blogdir/notes.git.</p>
+<pre><code>$ git clone user@host:blogdir/notes.git</code></pre>
+<h2 class="anchor" id="heading_3"><a href="#heading_3">To post an entry</a></h2>
+<p>In the cloned repository on the local machine, write an article in Markdown, then save it as <code>year/month/date-slug.md</code>. Do <code>git push</code> to publish it.</p>
+<pre><code>$ mkdir -p 2013/05
+$ echo &quot;# Test\n\nHello World&quot; &gt; 2013/05/27-test.md
+$ git add .
+$ git commit -m &quot;add test entry&quot;
+$ git push origin master</code></pre>
+<p>Commit message has no effect on Bitter.</p>
+<h2 class="anchor" id="heading_4"><a href="#heading_4">To edit an existing entry</a></h2>
+<pre><code>$ vim 2013/05/27-test.md
+$ git add -u
+$ git commit -m update
+$ git push origin master</code></pre>
+<h2 class="anchor" id="heading_5"><a href="#heading_5">To delete an entry</a></h2>
+<pre><code>$ git rm 2013/05/27-test.md
+$ git commit -m delete
+$ git push origin master</code></pre>
+<h2 class="anchor" id="heading_6"><a href="#heading_6">To embed static files</a></h2>
+<p>Put your static files under the directory that article resides. Those files can be referred to by relative path. For example, to embed 2013/05/images/winter.jpg, write following code in 2013/05/27-test.md.</p>
+<pre><code>![Winter photo](images/winter.jpg)</code></pre>
+<p>If you put static files under &quot;public&quot; directory, those files can be referred to by absolute path. For example, to embed public/images/spring.jpg:</p>
+<pre><code>![Spring photo](/images/spring.jpg)</code></pre>
+</div>
+<div class="author">Posted by <a href="http://kyu-mu.net/">Nao Iizuka</a></div><div class="powered-by">
+  Powered by <a href="http://notes.kyu-mu.net/2013/05/29/introducing_bitter_blog_engine">Bitter</a>
+</div>
+</body>
+</html>
