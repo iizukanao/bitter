@@ -132,9 +132,9 @@ elif [ "$1" = "server" ]; then
   server
 elif [ "$1" = "gitconfig" ]; then
   gitconfig
-elif [ "$1" = "version" ]; then
+elif [ "$1" = "version" ] || [ "$1" = "--version" ]; then
   echo "$VERSION"
-elif [ "$1" = "help" ]; then
+elif [ "$1" = "help" ] || [ "$1" = "--help" ]; then
   help
 else
   help
