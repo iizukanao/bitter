@@ -77,9 +77,9 @@ setup () {
 }
 
 server () {
-  if [ ! -e notes.git/HEAD ]; then
-    echo "Can't find notes.git"
-    echo "Execute this command from the directory that contains notes.git."
+  if [ ! -e notes/config/config.json ]; then
+    echo "Can't find notes/config/config.json"
+    echo "Execute this command from the directory that contains notes."
     echo "If you have not set up yet, do \"bitter setup\" first."
     exit 1
   fi
