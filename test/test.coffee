@@ -8,10 +8,14 @@ basedir = "#{__dirname}/notes"
 server = require('../server')
   port: 0
   basedir: basedir
-  quiet: true
+  quiet: true  # suppress all output
 
 httpServer = null
 baseurl = null
+
+assertSameHTML = (got, filename) ->
+  expected = fs.readFileSync "#{__dirname}/expected/#{filename}", encoding:'utf8'
+  assert.strictEqual got, expected, 'Same HTML'
 
 describe 'server', ->
   before (done) ->
@@ -32,8 +36,7 @@ describe 'server', ->
         assert.strictEqual err, null, 'No errors'
         assert.strictEqual resp.statusCode, 200, 'Status code is 200'
         assert.strictEqual resp.headers['content-type'], 'text/html; charset=utf-8', 'content-type'
-        expected = fs.readFileSync "#{__dirname}/expected/homepage", encoding:'utf8'
-        assert.strictEqual body, expected, 'HTML'
+        assertSameHTML body, 'homepage'
         done()
 
   describe '/recents', ->
@@ -42,8 +45,7 @@ describe 'server', ->
         assert.strictEqual err, null, 'No errors'
         assert.strictEqual resp.statusCode, 200, 'Status code is 200'
         assert.strictEqual resp.headers['content-type'], 'text/html; charset=utf-8', 'content-type'
-        expected = fs.readFileSync "#{__dirname}/expected/recents", encoding:'utf8'
-        assert.strictEqual body, expected, 'HTML'
+        assertSameHTML body, 'recents'
         done()
 
   describe '/2013/05/29/introducing_bitter_blog_engine', ->
@@ -52,9 +54,7 @@ describe 'server', ->
         assert.strictEqual err, null, 'No errors'
         assert.strictEqual resp.statusCode, 200, 'Status code is 200'
         assert.strictEqual resp.headers['content-type'], 'text/html; charset=utf-8', 'content-type'
-        expected = fs.readFileSync "#{__dirname}/expected/introducing_bitter_blog_engine",
-          encoding:'utf8'
-        assert.strictEqual body, expected, 'HTML'
+        assertSameHTML body, 'introducing_bitter_blog_engine'
         done()
 
   describe '/2013/05/28/blog_engine_bitter', ->
@@ -63,9 +63,7 @@ describe 'server', ->
         assert.strictEqual err, null, 'No errors'
         assert.strictEqual resp.statusCode, 200, 'Status code is 200'
         assert.strictEqual resp.headers['content-type'], 'text/html; charset=utf-8', 'content-type'
-        expected = fs.readFileSync "#{__dirname}/expected/blog_engine_bitter",
-          encoding:'utf8'
-        assert.strictEqual body, expected, 'HTML'
+        assertSameHTML body, 'blog_engine_bitter'
         done()
 
   describe '/2013/05/27/markdown_example', ->
@@ -74,9 +72,7 @@ describe 'server', ->
         assert.strictEqual err, null, 'No errors'
         assert.strictEqual resp.statusCode, 200, 'Status code is 200'
         assert.strictEqual resp.headers['content-type'], 'text/html; charset=utf-8', 'content-type'
-        expected = fs.readFileSync "#{__dirname}/expected/markdown_example",
-          encoding:'utf8'
-        assert.strictEqual body, expected, 'HTML'
+        assertSameHTML body, 'markdown_example'
         done()
 
   describe '/archives', ->
@@ -85,8 +81,7 @@ describe 'server', ->
         assert.strictEqual err, null, 'No errors'
         assert.strictEqual resp.statusCode, 200, 'Status code is 200'
         assert.strictEqual resp.headers['content-type'], 'text/html; charset=utf-8', 'content-type'
-        expected = fs.readFileSync "#{__dirname}/expected/archives", encoding:'utf8'
-        assert.strictEqual body, expected, 'HTML'
+        assertSameHTML body, 'archives'
         done()
 
   describe '/2013/', ->
@@ -95,8 +90,7 @@ describe 'server', ->
         assert.strictEqual err, null, 'No errors'
         assert.strictEqual resp.statusCode, 200, 'Status code is 200'
         assert.strictEqual resp.headers['content-type'], 'text/html; charset=utf-8', 'content-type'
-        expected = fs.readFileSync "#{__dirname}/expected/2013", encoding:'utf8'
-        assert.strictEqual body, expected, 'HTML'
+        assertSameHTML body, '2013'
         done()
 
   describe '/2013/05/', ->
@@ -105,8 +99,7 @@ describe 'server', ->
         assert.strictEqual err, null, 'No errors'
         assert.strictEqual resp.statusCode, 200, 'Status code is 200'
         assert.strictEqual resp.headers['content-type'], 'text/html; charset=utf-8', 'content-type'
-        expected = fs.readFileSync "#{__dirname}/expected/201305", encoding:'utf8'
-        assert.strictEqual body, expected, 'HTML'
+        assertSameHTML body, '201305'
         done()
 
   describe '/2013/05/27/images/winter.jpg', ->
