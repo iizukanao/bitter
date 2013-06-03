@@ -31,6 +31,7 @@ describe 'server', ->
       request "#{baseurl}/", (err, resp, body) ->
         assert.strictEqual err, null, 'No errors'
         assert.strictEqual resp.statusCode, 200, 'Status code is 200'
+        assert.strictEqual resp.headers['content-type'], 'text/html; charset=utf-8', 'content-type'
         expected = fs.readFileSync "#{__dirname}/expected/homepage", encoding:'utf8'
         assert.strictEqual body, expected, 'HTML'
         done()
@@ -40,6 +41,7 @@ describe 'server', ->
       request "#{baseurl}/recents", (err, resp, body) ->
         assert.strictEqual err, null, 'No errors'
         assert.strictEqual resp.statusCode, 200, 'Status code is 200'
+        assert.strictEqual resp.headers['content-type'], 'text/html; charset=utf-8', 'content-type'
         expected = fs.readFileSync "#{__dirname}/expected/recents", encoding:'utf8'
         assert.strictEqual body, expected, 'HTML'
         done()
@@ -49,6 +51,7 @@ describe 'server', ->
       request "#{baseurl}/2013/05/29/introducing_bitter_blog_engine", (err, resp, body) ->
         assert.strictEqual err, null, 'No errors'
         assert.strictEqual resp.statusCode, 200, 'Status code is 200'
+        assert.strictEqual resp.headers['content-type'], 'text/html; charset=utf-8', 'content-type'
         expected = fs.readFileSync "#{__dirname}/expected/introducing_bitter_blog_engine",
           encoding:'utf8'
         assert.strictEqual body, expected, 'HTML'
@@ -59,6 +62,7 @@ describe 'server', ->
       request "#{baseurl}/2013/05/28/blog_engine_bitter", (err, resp, body) ->
         assert.strictEqual err, null, 'No errors'
         assert.strictEqual resp.statusCode, 200, 'Status code is 200'
+        assert.strictEqual resp.headers['content-type'], 'text/html; charset=utf-8', 'content-type'
         expected = fs.readFileSync "#{__dirname}/expected/blog_engine_bitter",
           encoding:'utf8'
         assert.strictEqual body, expected, 'HTML'
@@ -69,6 +73,7 @@ describe 'server', ->
       request "#{baseurl}/2013/05/27/markdown_example", (err, resp, body) ->
         assert.strictEqual err, null, 'No errors'
         assert.strictEqual resp.statusCode, 200, 'Status code is 200'
+        assert.strictEqual resp.headers['content-type'], 'text/html; charset=utf-8', 'content-type'
         expected = fs.readFileSync "#{__dirname}/expected/markdown_example",
           encoding:'utf8'
         assert.strictEqual body, expected, 'HTML'
@@ -79,6 +84,7 @@ describe 'server', ->
       request "#{baseurl}/archives", (err, resp, body) ->
         assert.strictEqual err, null, 'No errors'
         assert.strictEqual resp.statusCode, 200, 'Status code is 200'
+        assert.strictEqual resp.headers['content-type'], 'text/html; charset=utf-8', 'content-type'
         expected = fs.readFileSync "#{__dirname}/expected/archives", encoding:'utf8'
         assert.strictEqual body, expected, 'HTML'
         done()
@@ -88,6 +94,7 @@ describe 'server', ->
       request "#{baseurl}/2013/", (err, resp, body) ->
         assert.strictEqual err, null, 'No errors'
         assert.strictEqual resp.statusCode, 200, 'Status code is 200'
+        assert.strictEqual resp.headers['content-type'], 'text/html; charset=utf-8', 'content-type'
         expected = fs.readFileSync "#{__dirname}/expected/2013", encoding:'utf8'
         assert.strictEqual body, expected, 'HTML'
         done()
@@ -97,6 +104,7 @@ describe 'server', ->
       request "#{baseurl}/2013/05/", (err, resp, body) ->
         assert.strictEqual err, null, 'No errors'
         assert.strictEqual resp.statusCode, 200, 'Status code is 200'
+        assert.strictEqual resp.headers['content-type'], 'text/html; charset=utf-8', 'content-type'
         expected = fs.readFileSync "#{__dirname}/expected/201305", encoding:'utf8'
         assert.strictEqual body, expected, 'HTML'
         done()
@@ -145,37 +153,41 @@ describe 'server', ->
       request "#{baseurl}/a", (err, resp, body) ->
         assert.strictEqual err, null, 'No errors'
         assert.strictEqual resp.statusCode, 404, 'Status code is 404'
+        assert.strictEqual resp.headers['content-type'], 'text/html; charset=utf-8', 'content-type'
         done()
 
   describe '/index.atom', ->
     it 'should return Atom feed', (done) ->
       meta = {}
       articles = []
-      request("#{baseurl}/index.atom")
-      .pipe(new FeedParser)
-      .on('error', (err) ->
-        assert.fail err, null, 'Error on parsing Atom feed'
-      ).on('meta', (m) ->
-        meta = m
-      ).on('article', (article) ->
-        articles.push article
-      ).on('end', ->
-        assert.strictEqual meta.title, 'MyLittleNotes', 'meta.title'
-        assert.strictEqual meta['atom:link'][0]['@'].href,
-          'http://notes.kyu-mu.net/index.atom', 'atom:link'
-        assert.strictEqual meta['atom:@'].xmlns, 'http://www.w3.org/2005/Atom', 'xmlns'
-        assert.strictEqual articles.length, 3, '3 articles'
-        assert.strictEqual articles[0].title, 'Bitter blog engine', 'articles[0].title'
-        assert (articles[0].description.indexOf('<h1>Bitter blog engine</h1>') isnt -1),
-          'articles[0].description'
-        assert.strictEqual articles[0].date.getTime(),
-          new Date('2013-05-29 00:00:00 +0900').getTime(),
-          'date'
-        assert.strictEqual articles[0].link,
-          'http://notes.kyu-mu.net/2013/05/29/introducing_bitter_blog_engine',
-          'articles[0].link'
-        assert.strictEqual articles[0].author, 'Nao Iizuka'
-        assert.strictEqual articles[1].title, 'ブログエンジンBitter'
-        assert.strictEqual articles[2].title, 'Markdown Example'
-        done()
-      )
+      request "#{baseurl}/index.atom", (err, resp, body) ->
+        assert.strictEqual err, null, 'No errors'
+        assert.strictEqual resp.statusCode, 200, 'Status code is 200'
+        assert.strictEqual resp.headers['content-type'], 'text/xml; charset=utf-8', 'content-type'
+        FeedParser.parseString(body)
+        .on('error', (err) ->
+          assert.fail err, null, 'Error on parsing Atom feed'
+        ).on('meta', (m) ->
+          meta = m
+        ).on('article', (article) ->
+          articles.push article
+        ).on('end', ->
+          assert.strictEqual meta.title, 'MyLittleNotes', 'meta.title'
+          assert.strictEqual meta['atom:link'][0]['@'].href,
+            'http://notes.kyu-mu.net/index.atom', 'atom:link'
+          assert.strictEqual meta['atom:@'].xmlns, 'http://www.w3.org/2005/Atom', 'xmlns'
+          assert.strictEqual articles.length, 3, '3 articles'
+          assert.strictEqual articles[0].title, 'Bitter blog engine', 'articles[0].title'
+          assert (articles[0].description.indexOf('<h1>Bitter blog engine</h1>') isnt -1),
+            'articles[0].description'
+          assert.strictEqual articles[0].date.getTime(),
+            new Date('2013-05-29 00:00:00 +0900').getTime(),
+            'date'
+          assert.strictEqual articles[0].link,
+            'http://notes.kyu-mu.net/2013/05/29/introducing_bitter_blog_engine',
+            'articles[0].link'
+          assert.strictEqual articles[0].author, 'Nao Iizuka'
+          assert.strictEqual articles[1].title, 'ブログエンジンBitter'
+          assert.strictEqual articles[2].title, 'Markdown Example'
+          done()
+        )
