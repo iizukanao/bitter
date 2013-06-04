@@ -326,7 +326,7 @@ init = (initOpts) ->
     logMessage "done (#{elapsedTime} ms)", noTime:true
 
   # Single entry (e.g. /2013/05/26/how_i_learned_javascript)
-  app.get /^\/(\d{4})\/(\d{2})\/(\d+)(-\d+)?\/(.*)$/, (req, res) ->
+  app.get /^\/(\d{4})\/(\d{2})\/(\d+)(-\d+)?\/(.*)$/, (req, res, next) ->
     year  = req.params[0]
     month = req.params[1]
     date  = req.params[2]
@@ -338,11 +338,13 @@ init = (initOpts) ->
       if not exists
         # Find static file that matches URL
         staticPath = "#{basedir}/#{year}/#{month}/#{slug}"
-        fs.exists staticPath, (exists) ->
-          if exists
-            res.sendfile staticPath
-          else
+        fs.stat staticPath, (err, stats) ->
+          if err
             respondWithNotFound res
+          else if stats.isDirectory()
+            next()  # Will match the next route
+          else
+            res.sendfile staticPath
         return
       fs.readFile filepath, {encoding:'utf8'}, (err, markdown) ->
         if err
@@ -362,6 +364,12 @@ init = (initOpts) ->
             return
           res.setHeader 'Content-Type', 'text/html; charset=utf-8'
           res.send html
+
+  # Redirect /2013/05/27/ to /2013/05/ (after matching against the previous route)
+  app.get /^\/(\d{4})\/(\d{2})\/[\d-]+\/?/, (req, res) ->
+    year  = req.params[0]
+    month = req.params[1]
+    res.redirect "/#{year}/#{month}/"
 
   # List of years
   app.get '/archives', (req, res) ->
@@ -440,12 +448,6 @@ init = (initOpts) ->
         return
       res.setHeader 'Content-Type', 'text/html; charset=utf-8'
       res.send html
-
-  # Redirect /2013/05/27/ to /2013/05/
-  app.get /^\/(\d{4})\/(\d{2})\/[\d-]+\/?/, (req, res) ->
-    year  = req.params[0]
-    month = req.params[1]
-    res.redirect "/#{year}/#{month}/"
 
   # Recent entries
   app.get '/recents', (req, res) ->
