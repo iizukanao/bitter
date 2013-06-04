@@ -360,7 +360,7 @@
         noTime: true
       });
     };
-    app.get(/^\/(\d{4})\/(\d{2})\/(\d+)(-\d+)?\/(.*)$/, function(req, res) {
+    app.get(/^\/(\d{4})\/(\d{2})\/(\d+)(-\d+)?\/(.*)$/, function(req, res, next) {
       var date, datepart, filepath, month, part, slug, year, _ref3;
       year = req.params[0];
       month = req.params[1];
@@ -373,11 +373,13 @@
         var staticPath;
         if (!exists) {
           staticPath = "" + basedir + "/" + year + "/" + month + "/" + slug;
-          fs.exists(staticPath, function(exists) {
-            if (exists) {
-              return res.sendfile(staticPath);
-            } else {
+          fs.stat(staticPath, function(err, stats) {
+            if (err) {
               return respondWithNotFound(res);
+            } else if (stats.isDirectory()) {
+              return next();
+            } else {
+              return res.sendfile(staticPath);
             }
           });
           return;
@@ -407,6 +409,12 @@
           });
         });
       });
+    });
+    app.get(/^\/(\d{4})\/(\d{2})\/[\d-]+\/?/, function(req, res) {
+      var month, year;
+      year = req.params[0];
+      month = req.params[1];
+      return res.redirect("/" + year + "/" + month + "/");
     });
     app.get('/archives', function(req, res) {
       var markdown, year, years, _i, _len;
@@ -488,12 +496,6 @@
         res.setHeader('Content-Type', 'text/html; charset=utf-8');
         return res.send(html);
       });
-    });
-    app.get(/^\/(\d{4})\/(\d{2})\/[\d-]+\/?/, function(req, res) {
-      var month, year;
-      year = req.params[0];
-      month = req.params[1];
-      return res.redirect("/" + year + "/" + month + "/");
     });
     app.get('/recents', function(req, res) {
       var entryUrl, file, markdown, ymd, _i, _len, _ref3;
