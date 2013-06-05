@@ -13,8 +13,6 @@ server = require('../server')
 httpServer = null
 baseurl = null
 
-# TODO: test /2013/05/27-3/something.md
-
 assertSameContent = (got, filename) ->
   expected = fs.readFileSync "#{__dirname}/expected/#{filename}", encoding:'utf8'
   assert.strictEqual got, expected, 'Same content'
