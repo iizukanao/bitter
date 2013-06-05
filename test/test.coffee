@@ -13,6 +13,8 @@ server = require('../server')
 httpServer = null
 baseurl = null
 
+# TODO: test /2013/05/27-3/something.md
+
 assertSameContent = (got, filename) ->
   expected = fs.readFileSync "#{__dirname}/expected/#{filename}", encoding:'utf8'
   assert.strictEqual got, expected, 'Same content'
@@ -75,6 +77,42 @@ describe 'server', ->
         assertSameContent body, 'markdown_example'
         done()
 
+  describe '/2013/05/26-10/zucchini-bread', ->
+    it 'should return an entry', (done) ->
+      request "#{baseurl}/2013/05/26-10/zucchini-bread", (err, resp, body) ->
+        assert.strictEqual err, null, 'No errors'
+        assert.strictEqual resp.statusCode, 200, 'Status code is 200'
+        assert.strictEqual resp.headers['content-type'], 'text/html; charset=utf-8', 'content-type'
+        assertSameContent body, 'zucchini-bread'
+        done()
+
+  describe '/2013/05/26-2/cake_box', ->
+    it 'should return an entry', (done) ->
+      request "#{baseurl}/2013/05/26-2/cake_box", (err, resp, body) ->
+        assert.strictEqual err, null, 'No errors'
+        assert.strictEqual resp.statusCode, 200, 'Status code is 200'
+        assert.strictEqual resp.headers['content-type'], 'text/html; charset=utf-8', 'content-type'
+        assertSameContent body, 'cake_box'
+        done()
+
+  describe '/2013/05/26-1/', ->
+    it 'should return an entry', (done) ->
+      request "#{baseurl}/2013/05/26-1/", (err, resp, body) ->
+        assert.strictEqual err, null, 'No errors'
+        assert.strictEqual resp.statusCode, 200, 'Status code is 200'
+        assert.strictEqual resp.headers['content-type'], 'text/html; charset=utf-8', 'content-type'
+        assertSameContent body, 'banana'
+        done()
+
+  describe '/2013/05/26/apple', ->
+    it 'should return an entry', (done) ->
+      request "#{baseurl}/2013/05/26/apple", (err, resp, body) ->
+        assert.strictEqual err, null, 'No errors'
+        assert.strictEqual resp.statusCode, 200, 'Status code is 200'
+        assert.strictEqual resp.headers['content-type'], 'text/html; charset=utf-8', 'content-type'
+        assertSameContent body, 'apple'
+        done()
+
   describe '/2013/05/26/', ->
     it 'should return an entry', (done) ->
       request
@@ -84,7 +122,7 @@ describe 'server', ->
         assert.strictEqual err, null, 'No errors'
         assert.strictEqual resp.statusCode, 200, 'Status code is 200'
         assert.strictEqual resp.headers['content-type'], 'text/html; charset=utf-8', 'content-type'
-        assertSameContent body, '20130526'
+        assertSameContent body, 'day_26'
         done()
 
   describe '/2013/05/27/', ->
@@ -200,7 +238,7 @@ describe 'server', ->
           assert.strictEqual meta['atom:link'][0]['@'].href,
             'http://notes.kyu-mu.net/index.atom', 'atom:link'
           assert.strictEqual meta['atom:@'].xmlns, 'http://www.w3.org/2005/Atom', 'xmlns'
-          assert.strictEqual articles.length, 4, '4 articles'
+          assert.strictEqual articles.length, 8, '8 articles'
           assert.strictEqual articles[0].title, 'Bitter blog engine', 'articles[0].title'
           assert (articles[0].description.indexOf('<h1>Bitter blog engine</h1>') isnt -1),
             'articles[0].description'
@@ -213,6 +251,10 @@ describe 'server', ->
           assert.strictEqual articles[0].author, 'Nao Iizuka'
           assert.strictEqual articles[1].title, 'ブログエンジンBitter'
           assert.strictEqual articles[2].title, 'Markdown Example'
-          assert.strictEqual articles[3].title, 'Day 26'
+          assert.strictEqual articles[3].title, 'Zucchini Bread'
+          assert.strictEqual articles[4].title, 'Cake Box'
+          assert.strictEqual articles[5].title, 'Banana'
+          assert.strictEqual articles[6].title, 'Apple'
+          assert.strictEqual articles[7].title, 'Day 26'
           done()
         )
