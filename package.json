@@ -29,7 +29,8 @@
   "devDependencies": {
     "request": "2.21.x",
     "mocha": "1.10.x",
-    "feedparser": "0.15.x"
+    "feedparser": "0.15.x",
+    "coffee-script": "1.x"
   },
   "license": "MIT",
   "engines": {
