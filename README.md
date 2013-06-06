@@ -14,7 +14,7 @@ _Waste everything but Git and Markdown_
 
 ### Requirements
 
-- Node.js v0.10.4 or later
+- Node.js v0.10.0 or later
 - "git" command
 
 ### Install
