@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/iizukanao/bitter.png)](https://travis-ci.org/iizukanao/bitter)
+
 ## Bitter - a minimal blog engine
 
 _Waste everything but Git and Markdown_
