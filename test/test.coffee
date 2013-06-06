@@ -241,7 +241,7 @@ describe 'server', ->
           assert (articles[0].description.indexOf('<h1>Bitter blog engine</h1>') isnt -1),
             'articles[0].description'
           assert.strictEqual articles[0].date.getTime(),
-            new Date('2013-05-29 00:00:00 +0900').getTime(),
+            new Date('2013-05-29 00:00:00').getTime(),
             'date'
           assert.strictEqual articles[0].link,
             'http://notes.kyu-mu.net/2013/05/29/introducing_bitter_blog_engine',
