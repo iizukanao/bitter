@@ -19,6 +19,8 @@ assertSameContent = (got, filename) ->
 
 describe 'server', ->
   before (done) ->
+    if fs.existsSync "#{basedir}/2013/05/30-new.md"
+      fs.unlinkSync "#{basedir}/2013/05/30-new.md"
     httpServer = server.start()
     httpServer.on 'error', (err) ->
       throw err
@@ -256,3 +258,19 @@ describe 'server', ->
           assert.strictEqual articles[7].title, 'Day 26'
           done()
         )
+
+  describe 'reindex-needed', ->
+    it 'should be used to update an index', (done) ->
+      @timeout 5500
+      fs.writeFileSync "#{basedir}/2013/05/30-new.md", '# New', {encoding:'utf8'}
+      fs.writeFileSync "#{basedir}/reindex-needed", '', {encoding:'utf8'}
+      setTimeout ->
+        assert.strictEqual fs.existsSync("#{basedir}/reindex-needed"), false, 'reindex-needed is deleted'
+        request "#{baseurl}/recents", (err, resp, body) ->
+          fs.unlinkSync "#{basedir}/2013/05/30-new.md"
+          assert.strictEqual err, null, 'No errors'
+          assert.strictEqual resp.statusCode, 200, 'Status code is 200'
+          assert.strictEqual resp.headers['content-type'], 'text/html; charset=utf-8', 'content-type'
+          assertSameContent body, 'recents-new'
+          done()
+      , 5000
