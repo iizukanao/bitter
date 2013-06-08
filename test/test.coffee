@@ -17,6 +17,20 @@ assertSameContent = (got, filename) ->
   expected = fs.readFileSync "#{__dirname}/expected/#{filename}", encoding:'utf8'
   assert.strictEqual got, expected, 'Same content'
 
+# Maximum acceptable response time (ms)
+acceptableResponseTime = 50
+
+# Call request function and measure the response time
+_request = ->
+  args = [arguments...]
+  startTime = new Date().getTime()
+  callback = ->
+    elapsed = new Date().getTime() - startTime
+    assert elapsed <= acceptableResponseTime, 'Response time is within the acceptable range'
+    args[args.length-1].apply null, arguments
+
+  request.apply null, args[0..args.length-2].concat callback
+
 describe 'server', ->
   before (done) ->
     if fs.existsSync "#{basedir}/2013/05/30-new.md"
@@ -34,7 +48,7 @@ describe 'server', ->
 
   describe '/', ->
     it 'should return homepage', (done) ->
-      request "#{baseurl}/", (err, resp, body) ->
+      _request "#{baseurl}/", (err, resp, body) ->
         assert.strictEqual err, null, 'No errors'
         assert.strictEqual resp.statusCode, 200, 'Status code is 200'
         assert.strictEqual resp.headers['content-type'], 'text/html; charset=utf-8', 'content-type'
@@ -43,7 +57,7 @@ describe 'server', ->
 
   describe '/recents', ->
     it 'should return recent entries', (done) ->
-      request "#{baseurl}/recents", (err, resp, body) ->
+      _request "#{baseurl}/recents", (err, resp, body) ->
         assert.strictEqual err, null, 'No errors'
         assert.strictEqual resp.statusCode, 200, 'Status code is 200'
         assert.strictEqual resp.headers['content-type'], 'text/html; charset=utf-8', 'content-type'
@@ -52,7 +66,7 @@ describe 'server', ->
 
   describe '/2013/05/29/introducing_bitter_blog_engine', ->
     it 'should return an entry', (done) ->
-      request "#{baseurl}/2013/05/29/introducing_bitter_blog_engine", (err, resp, body) ->
+      _request "#{baseurl}/2013/05/29/introducing_bitter_blog_engine", (err, resp, body) ->
         assert.strictEqual err, null, 'No errors'
         assert.strictEqual resp.statusCode, 200, 'Status code is 200'
         assert.strictEqual resp.headers['content-type'], 'text/html; charset=utf-8', 'content-type'
@@ -61,7 +75,7 @@ describe 'server', ->
 
   describe '/2013/05/28/blog_engine_bitter', ->
     it 'should return an entry', (done) ->
-      request "#{baseurl}/2013/05/28/blog_engine_bitter", (err, resp, body) ->
+      _request "#{baseurl}/2013/05/28/blog_engine_bitter", (err, resp, body) ->
         assert.strictEqual err, null, 'No errors'
         assert.strictEqual resp.statusCode, 200, 'Status code is 200'
         assert.strictEqual resp.headers['content-type'], 'text/html; charset=utf-8', 'content-type'
@@ -70,7 +84,7 @@ describe 'server', ->
 
   describe '/2013/05/27/markdown_example', ->
     it 'should return an entry', (done) ->
-      request "#{baseurl}/2013/05/27/markdown_example", (err, resp, body) ->
+      _request "#{baseurl}/2013/05/27/markdown_example", (err, resp, body) ->
         assert.strictEqual err, null, 'No errors'
         assert.strictEqual resp.statusCode, 200, 'Status code is 200'
         assert.strictEqual resp.headers['content-type'], 'text/html; charset=utf-8', 'content-type'
@@ -79,7 +93,7 @@ describe 'server', ->
 
   describe '/2013/05/26-10/zucchini-bread', ->
     it 'should return an entry', (done) ->
-      request "#{baseurl}/2013/05/26-10/zucchini-bread", (err, resp, body) ->
+      _request "#{baseurl}/2013/05/26-10/zucchini-bread", (err, resp, body) ->
         assert.strictEqual err, null, 'No errors'
         assert.strictEqual resp.statusCode, 200, 'Status code is 200'
         assert.strictEqual resp.headers['content-type'], 'text/html; charset=utf-8', 'content-type'
@@ -88,7 +102,7 @@ describe 'server', ->
 
   describe '/2013/05/26-2/cake_box', ->
     it 'should return an entry', (done) ->
-      request "#{baseurl}/2013/05/26-2/cake_box", (err, resp, body) ->
+      _request "#{baseurl}/2013/05/26-2/cake_box", (err, resp, body) ->
         assert.strictEqual err, null, 'No errors'
         assert.strictEqual resp.statusCode, 200, 'Status code is 200'
         assert.strictEqual resp.headers['content-type'], 'text/html; charset=utf-8', 'content-type'
@@ -97,7 +111,7 @@ describe 'server', ->
 
   describe '/2013/05/26-1/', ->
     it 'should return an entry', (done) ->
-      request "#{baseurl}/2013/05/26-1/", (err, resp, body) ->
+      _request "#{baseurl}/2013/05/26-1/", (err, resp, body) ->
         assert.strictEqual err, null, 'No errors'
         assert.strictEqual resp.statusCode, 200, 'Status code is 200'
         assert.strictEqual resp.headers['content-type'], 'text/html; charset=utf-8', 'content-type'
@@ -106,7 +120,7 @@ describe 'server', ->
 
   describe '/2013/05/26/apple', ->
     it 'should return an entry', (done) ->
-      request "#{baseurl}/2013/05/26/apple", (err, resp, body) ->
+      _request "#{baseurl}/2013/05/26/apple", (err, resp, body) ->
         assert.strictEqual err, null, 'No errors'
         assert.strictEqual resp.statusCode, 200, 'Status code is 200'
         assert.strictEqual resp.headers['content-type'], 'text/html; charset=utf-8', 'content-type'
@@ -115,7 +129,7 @@ describe 'server', ->
 
   describe '/2013/05/26/', ->
     it 'should return an entry', (done) ->
-      request
+      _request
         url: "#{baseurl}/2013/05/26/"
         followRedirect: false
       , (err, resp, body) ->
@@ -127,7 +141,7 @@ describe 'server', ->
 
   describe '/2013/05/27/', ->
     it 'should redirect to /2013/05/', (done) ->
-      request
+      _request
         url: "#{baseurl}/2013/05/27/"
         followRedirect: false
       , (err, resp, body) ->
@@ -138,7 +152,7 @@ describe 'server', ->
 
   describe '/2013/05/27/abc', ->
     it 'should return 404', (done) ->
-      request "#{baseurl}/2013/05/27/abc", (err, resp, body) ->
+      _request "#{baseurl}/2013/05/27/abc", (err, resp, body) ->
         assert.strictEqual err, null, 'No errors'
         assert.strictEqual resp.statusCode, 404, 'Status code is 404'
         assert.strictEqual resp.headers['content-type'], 'text/html; charset=utf-8', 'content-type'
@@ -146,7 +160,7 @@ describe 'server', ->
 
   describe '/archives', ->
     it 'should return a list of years', (done) ->
-      request "#{baseurl}/archives", (err, resp, body) ->
+      _request "#{baseurl}/archives", (err, resp, body) ->
         assert.strictEqual err, null, 'No errors'
         assert.strictEqual resp.statusCode, 200, 'Status code is 200'
         assert.strictEqual resp.headers['content-type'], 'text/html; charset=utf-8', 'content-type'
@@ -155,7 +169,7 @@ describe 'server', ->
 
   describe '/2013/', ->
     it 'should return entries for 2013', (done) ->
-      request "#{baseurl}/2013/", (err, resp, body) ->
+      _request "#{baseurl}/2013/", (err, resp, body) ->
         assert.strictEqual err, null, 'No errors'
         assert.strictEqual resp.statusCode, 200, 'Status code is 200'
         assert.strictEqual resp.headers['content-type'], 'text/html; charset=utf-8', 'content-type'
@@ -164,7 +178,7 @@ describe 'server', ->
 
   describe '/2013/05/', ->
     it 'should return entries for 2013-05', (done) ->
-      request "#{baseurl}/2013/05/", (err, resp, body) ->
+      _request "#{baseurl}/2013/05/", (err, resp, body) ->
         assert.strictEqual err, null, 'No errors'
         assert.strictEqual resp.statusCode, 200, 'Status code is 200'
         assert.strictEqual resp.headers['content-type'], 'text/html; charset=utf-8', 'content-type'
@@ -173,7 +187,7 @@ describe 'server', ->
 
   describe '/2013/05/27/images/winter.jpg', ->
     it 'should return a jpg file', (done) ->
-      request
+      _request
         url: "#{baseurl}/2013/05/27/images/winter.jpg"
         encoding: null
       , (err, resp, body) ->
@@ -186,7 +200,7 @@ describe 'server', ->
 
   describe '/images/fall.png', ->
     it 'should return a png file', (done) ->
-      request
+      _request
         url: "#{baseurl}/images/fall.png"
         encoding: null
       , (err, resp, body) ->
@@ -199,7 +213,7 @@ describe 'server', ->
 
   describe '/images/beach.gif', ->
     it 'should return a gif file', (done) ->
-      request
+      _request
         url: "#{baseurl}/images/beach.gif"
         encoding: null
       , (err, resp, body) ->
@@ -212,7 +226,7 @@ describe 'server', ->
 
   describe '/a', ->
     it 'should return 404', (done) ->
-      request "#{baseurl}/a", (err, resp, body) ->
+      _request "#{baseurl}/a", (err, resp, body) ->
         assert.strictEqual err, null, 'No errors'
         assert.strictEqual resp.statusCode, 404, 'Status code is 404'
         assert.strictEqual resp.headers['content-type'], 'text/html; charset=utf-8', 'content-type'
@@ -222,7 +236,7 @@ describe 'server', ->
     it 'should return Atom feed', (done) ->
       meta = {}
       articles = []
-      request "#{baseurl}/index.atom", (err, resp, body) ->
+      _request "#{baseurl}/index.atom", (err, resp, body) ->
         assert.strictEqual err, null, 'No errors'
         assert.strictEqual resp.statusCode, 200, 'Status code is 200'
         assert.strictEqual resp.headers['content-type'], 'text/xml; charset=utf-8', 'content-type'
@@ -266,7 +280,7 @@ describe 'server', ->
       fs.writeFileSync "#{basedir}/reindex-needed", '', {encoding:'utf8'}
       setTimeout ->
         assert.strictEqual fs.existsSync("#{basedir}/reindex-needed"), false, 'reindex-needed is deleted'
-        request "#{baseurl}/recents", (err, resp, body) ->
+        _request "#{baseurl}/recents", (err, resp, body) ->
           fs.unlinkSync "#{basedir}/2013/05/30-new.md"
           assert.strictEqual err, null, 'No errors'
           assert.strictEqual resp.statusCode, 200, 'Status code is 200'
