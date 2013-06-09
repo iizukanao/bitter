@@ -5,10 +5,11 @@ FeedParser = require 'feedparser'
 
 basedir = "#{__dirname}/notes"
 
-server = require('../server')
-  port: 0
+BitterServer = require('../server')
+bitterServer = new BitterServer
+  port   : 0
   basedir: basedir
-  quiet: true  # suppress all output
+  quiet  : true  # suppress all output
 
 httpServer = null
 baseurl = null
@@ -35,7 +36,7 @@ describe 'server', ->
   before (done) ->
     if fs.existsSync "#{basedir}/2013/05/30-new.md"
       fs.unlinkSync "#{basedir}/2013/05/30-new.md"
-    httpServer = server.start()
+    httpServer = bitterServer.start()
     httpServer.on 'error', (err) ->
       throw err
     httpServer.on 'listening', ->
@@ -43,7 +44,7 @@ describe 'server', ->
       done()
 
   after (done) ->
-    server.stop()
+    bitterServer.stop()
     done()
 
   describe '/', ->
@@ -276,9 +277,10 @@ describe 'server', ->
   describe 'reindex-needed', ->
     it 'should be used to update an index', (done) ->
       @timeout 5500
-      fs.writeFileSync "#{basedir}/2013/05/30-new.md", '# New', {encoding:'utf8'}
-      fs.writeFileSync "#{basedir}/reindex-needed", '', {encoding:'utf8'}
-      setTimeout ->
+      startTime = new Date().getTime()
+      bitterServer.once 'updateIndex', ->
+        elapsed = new Date().getTime() - startTime
+        assert elapsed < 5000, 'Index is updated within 5000 ms'
         assert.strictEqual fs.existsSync("#{basedir}/reindex-needed"), false, 'reindex-needed is deleted'
         _request "#{baseurl}/recents", (err, resp, body) ->
           fs.unlinkSync "#{basedir}/2013/05/30-new.md"
@@ -287,4 +289,5 @@ describe 'server', ->
           assert.strictEqual resp.headers['content-type'], 'text/html; charset=utf-8', 'content-type'
           assertSameContent body, 'recents-new'
           done()
-      , 5000
+      fs.writeFileSync "#{basedir}/2013/05/30-new.md", '# New', {encoding:'utf8'}
+      fs.writeFileSync "#{basedir}/reindex-needed", '', {encoding:'utf8'}

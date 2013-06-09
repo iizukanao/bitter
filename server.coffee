@@ -1,64 +1,365 @@
 fs      = require 'fs'
 path    = require 'path'
+http    = require 'http'
+events  = require 'events'
+
 ejs     = require 'ejs'
 marked  = require 'marked'
 express = require 'express'
-http    = require 'http'
 
-init = (initOpts) ->
-  # Base directory of entries
-  basedir = initOpts?.basedir ? path.normalize "#{process.cwd()}/notes"
+# Markdown formatting options
+marked.setOptions
+  gfm       : true
+  tables    : true
+  breaks    : true
+  pedantic  : false
+  sanitize  : false
+  smartLists: true
+  langPrefix: 'lang-'
 
-  # Port to listen (default is 1341)
-  PORT = initOpts?.port ? process.env.PORT ? 1341
+class BitterServer extends events.EventEmitter
+  constructor: (opts) ->
+    @constructorOpts = opts
 
-  # Path to config.json
-  configFilename = "#{basedir}/config/config.json"
+    # Base directory of entries
+    @basedir = opts?.basedir ? path.normalize "#{process.cwd()}/notes"
 
-  # EJS template for formatting pages
-  pageTemplateFilename = "#{basedir}/config/page.ejs"
+    # Port to listen (default is 1341)
+    @port = opts?.port ? process.env.PORT ? 1341
 
-  # Existence of this file means that
-  # the index is needed to be generated again.
-  reindexCheckFilename = "#{basedir}/reindex-needed"
+    # Path to config.json
+    @configFilename = "#{@basedir}/config/config.json"
 
-  monthNames = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'
-  ]
+    # EJS template for formatting pages
+    @pageTemplateFilename = "#{@basedir}/config/page.ejs"
 
-  formatDate = (year, month, date) ->
-    "#{monthNames[month-1]} #{parseInt date}, #{year}"
+    # Existence of this file means that
+    # the index is needed to be generated again.
+    @reindexCheckFilename = "#{@basedir}/reindex-needed"
 
-  # config.json is loaded to this variable
-  config = null
+    # config.json is loaded to this variable
+    @config = null
 
-  # EJS Template for each page
-  pageTemplate = null
+    # Object for storing index
+    @recentInfo = {}
 
-  app = express()
-  httpServer = http.createServer app
+    # EJS Template for each page
+    @pageTemplate = null
 
-  # Log requests
-  #app.use express.logger()
+    # Ensure config.json exists
+    if not fs.existsSync @configFilename
+      console.log "Error: #{@configFilename} does not exist"
+      process.exit 1
 
-  # gzip/deflate response
-  app.use express.compress()
+    err = @loadConfig()
+    if err?
+      process.exit 1
 
-  # Add X-Response-Time to response header
-  app.use express.responseTime()
+    @app = express()
+    @httpServer = http.createServer @app
 
-  # Serve static files in #{basedir}/public
-  app.use express.static "#{basedir}/public"
+    # Log requests
+    #@app.use express.logger()
 
-  # Ensure config.json exists
-  if not fs.existsSync configFilename
-    console.log "#{configFilename} does not exist"
-    process.exit 1
+    # gzip/deflate response
+    @app.use express.compress()
+
+    # Add X-Response-Time to response header
+    @app.use express.responseTime()
+
+    # Serve static files in #{@basedir}/public
+    @app.use express.static "#{@basedir}/public"
+
+    # Single entry (e.g. /2013/05/26/how_i_learned_javascript)
+    @app.get /^\/(\d{4})\/(\d{2})\/(\d+)(-\d+)?\/(.*)$/, (req, res, next) =>
+      year  = req.params[0]
+      month = req.params[1]
+      date  = req.params[2]
+      part  = req.params[3] ? ''
+      slug  = req.params[4]
+      datepart = date + part
+      filepath = "#{@basedir}/#{year}/#{month}/#{datepart}-#{slug}.md"
+      fs.exists filepath, (exists) =>
+        if not exists
+          # Find static file that matches URL
+          staticPath = "#{@basedir}/#{year}/#{month}/#{slug}"
+          fs.stat staticPath, (err, stats) =>
+            if err
+              @respondWithNotFound res
+            else if stats.isDirectory()
+              next()  # Will match the next route
+            else
+              res.sendfile staticPath
+          return
+        fs.readFile filepath, {encoding:'utf8'}, (err, markdown) =>
+          if err
+            @logMessage err
+            @respondWithServerError res
+            return
+          @formatPage {
+            markdown: markdown
+            link    : "/#{year}/#{month}/#{datepart}/#{slug}"
+            year    : year
+            month   : month
+            date    : date
+          }, (err, html) =>
+            if err
+              @logMessage err
+              @respondWithServerError res
+              return
+            res.setHeader 'Content-Type', 'text/html; charset=utf-8'
+            res.send html
+
+    # Redirect /2013/05/27/ to /2013/05/ (after matching against the previous route)
+    @app.get /^\/(\d{4})\/(\d{2})\/[\d-]+\/?/, (req, res) ->
+      year  = req.params[0]
+      month = req.params[1]
+      res.redirect "/#{year}/#{month}/"
+
+    # List of years
+    @app.get '/archives', (req, res) =>
+      years = @listYears()
+      markdown = """
+      ## Archives
+
+      """
+      for year in years
+        markdown += "[#{year}](/#{year}/)\n"
+      @formatPage {
+        markdown   : markdown
+        noTitleLink: true
+        noAuthor   : true
+      }, (err, html) =>
+        if err
+          @logMessage err
+          @respondWithServerError res
+          return
+        res.setHeader 'Content-Type', 'text/html; charset=utf-8'
+        res.send html
+
+    # Archives for a year (e.g. /2013/)
+    @app.get /^\/(\d{4})\/?$/, (req, res) =>
+      year = req.params[0]
+      months = @listMonths year
+      markdown = """
+      ## Archives for #{year}
+
+      """
+      for month in months
+        markdown += "[#{year}-#{month}](/#{year}/#{month}/)\n"
+      @formatPage {
+        markdown   : markdown
+        noTitleLink: true
+        noAuthor   : true
+      }, (err, html) =>
+        if err
+          @logMessage err
+          @respondWithServerError res
+          return
+        res.setHeader 'Content-Type', 'text/html; charset=utf-8'
+        res.send html
+
+    # Archives for a month (e.g. /2013/05/)
+    @app.get /^\/(\d{4})\/(\d{2})\/?$/, (req, res) =>
+      year = req.params[0]
+      month = req.params[1]
+      files = @listEntries year, month
+      markdown = """
+      ## Archives for [#{year}](/#{year}/)-#{month}
+
+      """
+      for file in files
+        match = /^(\d+)(-\d+)?-(.*)\.md$/.exec file
+        date = match[1]
+        part = match[2] ? ''
+        slug = match[3]
+        datepart = date + part
+
+        filepath = "#{@basedir}/#{year}/#{month}/#{file}"
+        content = fs.readFileSync filepath, {encoding:'utf8'}
+        lex = marked.Lexer.lex(content)
+        title = @findTitleFromLex(lex) ? ''
+        markdown += "#{@formatDate year, month, date} " + \
+        "[#{title or '(untitled)'}](/#{year}/#{month}/#{datepart}/#{slug})\n"
+      @formatPage {
+        markdown   : markdown
+        title      : "Archives for #{year}-#{month}"
+        noTitleLink: true
+        noAuthor   : true
+      }, (err, html) =>
+        if err
+          @logMessage err
+          @respondWithServerError res
+          return
+        res.setHeader 'Content-Type', 'text/html; charset=utf-8'
+        res.send html
+
+    # Recent entries
+    @app.get '/recents', (req, res) =>
+      markdown = """
+      ## Recent Entries
+
+      """
+      for file in @recentInfo.recentFiles
+        entryUrl = "/#{file.year}/#{file.month}/#{file.datepart}/#{file.slug}"
+        ymd = @formatDate file.year, file.month, file.date
+        markdown += "#{ymd} [#{file.title or '(untitled)'}](#{entryUrl})\n"
+      markdown += "\n\n[Archives](/archives)"
+      @formatPage {
+        markdown   : markdown
+        noTitleLink: true
+        noAuthor   : true
+      }, (err, html) =>
+        if err
+          @logMessage err
+          @respondWithServerError res
+          return
+        res.setHeader 'Content-Type', 'text/html; charset=utf-8'
+        res.send html
+
+    # Atom feed
+    @app.get '/index.atom', (req, res) =>
+      buf = """
+      <?xml version="1.0" encoding="utf-8"?>
+      <feed xmlns="http://www.w3.org/2005/Atom">
+      <title>#{@config.siteName}</title>
+      <link href="#{@config.siteURL}/index.atom" rel="self" />
+      <link href="#{@config.siteURL}" />
+      <id>#{@escapeTags @config.siteURL + '/'}</id>
+      <updated>#{new Date(@recentInfo.generatedTime).toISOString()}</updated>
+      """
+      for file in @recentInfo.recentFiles
+        html = @convertToAbsoluteLinks file.body, {
+          year       : file.year
+          month      : file.month
+          date       : file.date
+          absoluteURL: true
+        }
+        entryUrl = "#{@config.siteURL}/#{file.year}/#{file.month}/#{file.datepart}/#{file.slug}"
+        title = file.title
+        if (not title?) or (title is '')
+          title = '(untitled)'
+        buf += """
+      <entry>
+        <title>#{@escapeTags title}</title>
+        <link href="#{entryUrl}" />
+        <id>#{entryUrl}</id>
+        <updated>#{new Date(file.time).toISOString()}</updated>
+        <content type="html">#{@escapeTags html}</content>
+        <author>
+          <name>#{@escapeTags @config.authorName}</name>
+          <uri>#{@escapeTags @config.authorLink}</uri>
+
+        """
+        if @config.authorEmail
+          buf += "    <email>#{@config.authorEmail}</email>"
+        buf += """
+
+        </author>
+      </entry>
+        """
+      buf += "\n</feed>\n"
+      res.setHeader 'Content-Type', 'text/xml; charset=utf-8'
+      res.send buf
+
+    # Homepage: display the most recent entry
+    @app.get '/', (req, res) =>
+      file = @recentInfo.recentFiles[0]
+      if not file?
+        res.setHeader 'Content-Type', 'text/plain; charset=utf-8'
+        # Empty content message
+        res.send """
+        This is the place where your content will appear.
+
+        Add a first entry like this:
+
+        mkdir -p 2013/05
+        echo "# Test\\n\\nHello World" > 2013/05/27-test.md
+        git add .
+        git commit -m "add test entry"
+        git push origin master
+
+        Finished? Then reload this page slowly.
+        """
+        return
+      filepath = "#{@basedir}/#{file.year}/#{file.month}/#{file.datepart}-#{file.slug}.md"
+      fs.readFile filepath, {encoding:'utf8'}, (err, markdown) =>
+        if err
+          @logMessage err
+          @respondWithServerError res
+          return
+        url = "/#{file.year}/#{file.month}/#{file.datepart}/#{file.slug}"
+        @formatPage {
+          markdown    : markdown
+          link        : url
+          year        : file.year
+          month       : file.month
+          date        : file.date
+          noTitle     : true
+          absolutePath: true
+        }, (err, html) =>
+          if err
+            @logMessage err
+            @respondWithServerError res
+            return
+          res.setHeader 'Content-Type', 'text/html; charset=utf-8'
+          res.send html
+
+    # Not found
+    @app.get '*', (req, res) =>
+      @respondWithNotFound res
+
+    # Log unhandled errors
+    @app.use (err, req, res, next) ->
+      console.error err.stack
+      next err
+
+    if opts?.autoStart
+      @start()
+
+  start: (callback) ->
+    if fs.existsSync @reindexCheckFilename
+      fs.unlink @reindexCheckFilename
+
+    # Watch reindex-needed to be created
+    fs.watchFile @reindexCheckFilename, (curr, prev) =>
+      if curr.nlink > 0
+        fs.unlink @reindexCheckFilename, =>
+          @createIndex()
+          @emit 'updateIndex'
+
+    # Watch config.json to be updated
+    fs.watchFile @configFilename, (curr, prev) =>
+      err = @loadConfig()
+      if not err?
+        @logMessage "loaded #{path.basename @configFilename}"
+
+    # Load page template and watch it for change
+    @pageTemplate = fs.readFileSync @pageTemplateFilename, {encoding:'utf8'}
+    fs.watchFile @pageTemplateFilename, (curr, prev) =>
+      fs.readFile @pageTemplateFilename, {encoding:'utf8'}, (err, data) =>
+        if err
+          @logMessage "#{@pageTemplateFilename} read error: #{err}"
+          return
+        @pageTemplate = data
+        @logMessage "loaded #{path.basename @pageTemplateFilename}"
+
+    @createIndex()
+    @httpServer.listen @port
+    @httpServer.on 'listening', =>
+      @logMessage "Server started on port #{@httpServer.address().port}"
+
+  stop: ->
+    fs.unwatchFile @reindexCheckFilename
+    fs.unwatchFile @configFilename
+    fs.unwatchFile @pageTemplateFilename
+
+    @httpServer.close =>
+      @logMessage "Server closed"
 
   # Log message to stdout
-  logMessage = (str, opts) ->
-    if initOpts?.quiet
+  logMessage: (str, opts) ->
+    if @constructorOpts?.quiet
       return
     buf = ''
     if not opts?.noTime
@@ -69,83 +370,73 @@ init = (initOpts) ->
       buf += "\n"
     process.stdout.write buf
 
+  monthNames: [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ]
+
+  formatDate: (year, month, date) ->
+    "#{@monthNames[month-1]} #{parseInt date}, #{year}"
+
   # Obfuscate email address
-  obfuscateEmail = (str) ->
+  obfuscateEmail: (str) ->
     buf = ''
     for i in [0...str.length]
       buf += "&##{str.charCodeAt i};"
     buf
 
+  # Escape HTML/XML tags
+  escapeTags: (str) ->
+    str.replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+
   # Load config.json
-  loadConfig = ->
+  loadConfig: ->
     try
-      config = JSON.parse fs.readFileSync configFilename
+      @config = JSON.parse fs.readFileSync @configFilename
     catch e
-      logMessage "#{configFilename} read error: #{e}"
+      @logMessage "#{@configFilename} read error: #{e}"
       return e
-    config.siteURL = config.siteURL.replace /\/$/, ''
-    config.authorEmail = obfuscateEmail config.authorEmail
+    @config.siteURL = @config.siteURL.replace /\/$/, ''
+    @config.authorEmail = @obfuscateEmail @config.authorEmail
     null  # no error
 
-  err = loadConfig()
-  if err?
-    process.exit 1
-
-  # Object for storing index
-  recentInfo = {}
-
-  # Markdown formatting options
-  marked.setOptions
-    gfm       : true
-    tables    : true
-    breaks    : true
-    pedantic  : false
-    sanitize  : false
-    smartLists: true
-    langPrefix: 'lang-'
-
-  # Escape HTML/XML tags
-  escapeTags = (str) ->
-    str = str.replace /&/g, '&amp;'
-    str = str.replace /</g, '&lt;'
-    str = str.replace />/g, '&gt;'
-    str = str.replace /"/g, '&quot;'
-    str
-
   # 500 Server Error
-  respondWithServerError = (res) ->
+  respondWithServerError: (res) ->
     markdown = """
     ## Server Error
 
     Please try again later.
 
     """
-    formatPage {markdown:markdown, noTitleLink:true, noAuthor:true}, (err, html) ->
+    @formatPage {markdown:markdown, noTitleLink:true, noAuthor:true}, (err, html) =>
       if err
-        logMessage err
+        @logMessage err
         res.send 500, 'Server error'
         return
       res.setHeader 'Content-Type', 'text/html; charset=utf-8'
       res.send 500, html
 
   # 404 Not Found
-  respondWithNotFound = (res) ->
+  respondWithNotFound: (res) ->
     markdown = """
     ## Not Found
 
     The requested document was not found.
 
     """
-    formatPage {markdown:markdown, noTitleLink:true, noAuthor:true}, (err, html) ->
+    @formatPage {markdown:markdown, noTitleLink:true, noAuthor:true}, (err, html) =>
       if err
-        logMessage err
-        respondWithServerError res
+        @logMessage err
+        @respondWithServerError res
         return
       res.setHeader 'Content-Type', 'text/html; charset=utf-8'
       res.send 404, html
 
   # Find first heading from lex object
-  findTitleFromLex = (lex) ->
+  findTitleFromLex: (lex) ->
     for component in lex
       if component.type is 'heading'
         return component.text
@@ -157,11 +448,11 @@ init = (initOpts) ->
   #     year  (string): entry's year
   #     month (string): entry's month
   #     date  (string): entry's date
-  #     absoluteURL (boolean): If true, prepend config.siteURL
+  #     absoluteURL (boolean): If true, prepend @config.siteURL
   #                            If false, start with /
   #   }
-  convertToAbsoluteLinks = (html, params) ->
-    html = html.replace /(<a href|<img src)="(.*?)"/g, (match, p1, p2) ->
+  convertToAbsoluteLinks: (html, params) ->
+    html = html.replace /(<a href|<img src)="(.*?)"/g, (match, p1, p2) =>
       p2 = p2.replace /^\.\.\/(?!\.\.)/g, "/#{params.year}/#{params.month}/"
       p2 = p2.replace /^\.\.\/\.\.\/(?!\.\.)/g, "/#{params.year}/"
       p2 = p2.replace /^\.\.\/\.\.\/\.\.\/(?!\.\.)/g, "/"
@@ -169,18 +460,18 @@ init = (initOpts) ->
         if p2[0] isnt '/'
           p2 = "/#{params.year}/#{params.month}/#{params.date}/#{p2}"
         if params.absoluteURL
-          p2 = "#{config.siteURL}#{p2}"
+          p2 = "#{@config.siteURL}#{p2}"
       "#{p1}=\"#{p2}\""
     html
 
   # Format Markdown content into HTML
-  formatPage = (input, callback) ->
+  formatPage: (input, callback) ->
     lex = marked.Lexer.lex(input.markdown)
 
     # Title
     title = input.title ? null
     if not title?
-      lexTitle = findTitleFromLex lex
+      lexTitle = @findTitleFromLex lex
       if lexTitle?
         title = lexTitle
     if not title?
@@ -189,14 +480,14 @@ init = (initOpts) ->
     body = marked.Parser.parse(lex)
     # Convert relative links to absolute
     if input.absolutePath or input.absoluteURL
-      body = convertToAbsoluteLinks body, input
+      body = @convertToAbsoluteLinks body, input
 
     # Date
     if input.year? and input.month? and input.date?
       buf = "<div class=\"date\">"
       if not input.noTitleLink
         buf += "<a href=\"#{input.link}\">"
-      buf += "#{formatDate input.year, input.month, input.date}"
+      buf += "#{@formatDate input.year, input.month, input.date}"
       if not input.noTitleLink
         buf += "</a>"
       buf += "</div>\n"
@@ -206,10 +497,10 @@ init = (initOpts) ->
     author = undefined
     if not input.noAuthor
       author = "<div class=\"author\">Posted by " + \
-      "<a href=\"#{config.authorLink}\">#{config.authorName}</a>"
-      if config.authorEmail
-        author += " &lt;<a href=\"mailto:#{config.authorEmail}\">" + \
-        "#{config.authorEmail}</a>&gt;"
+      "<a href=\"#{@config.authorLink}\">#{@config.authorName}</a>"
+      if @config.authorEmail
+        author += " &lt;<a href=\"mailto:#{@config.authorEmail}\">" + \
+        "#{@config.authorEmail}</a>&gt;"
       author += "</div>"
 
     # Link title
@@ -233,32 +524,32 @@ init = (initOpts) ->
       title   : title
       body    : body
       author  : author
-      siteName: config.siteName
-      siteURL : config.siteURL
+      siteName: @config.siteName
+      siteURL : @config.siteURL
     if input.noTitle
       opts.title = undefined
 
     # Apply page.ejs to page contents
-    html = ejs.render pageTemplate, opts
+    html = ejs.render @pageTemplate, opts
     callback null, html
 
   # List all years
-  listYears = ->
-    years = fs.readdirSync basedir
+  listYears: ->
+    years = fs.readdirSync @basedir
     years = (year for year in years when /\d{4}/.test year)
     years.sort (a, b) -> b - a
     years
 
   # List all months for the given year
-  listMonths = (year) ->
-    months = fs.readdirSync "#{basedir}/#{year}"
+  listMonths: (year) ->
+    months = fs.readdirSync "#{@basedir}/#{year}"
     months = (month for month in months when /\d{2}/.test month)
     months.sort (a, b) -> b - a
     months
 
   # List all entries for the given year/month
-  listEntries = (year, month) ->
-    files = fs.readdirSync "#{basedir}/#{year}/#{month}"
+  listEntries: (year, month) ->
+    files = fs.readdirSync "#{@basedir}/#{year}/#{month}"
     files = (file for file in files when /\.md$/.test file)
     files.sort (a, b) ->
       intA = parseInt a
@@ -278,27 +569,27 @@ init = (initOpts) ->
     files
 
   # Scan entries and update index
-  createIndex = (numRecents=15) ->
-    logMessage "indexing...", noNewline:true
+  createIndex: (numRecents=15) ->
+    @logMessage "indexing...", noNewline:true
     startTime = new Date().getTime()
     count = 0
     recentFiles = []
-    years = listYears()
+    years = @listYears()
     for year in years
       break if count >= numRecents
-      months = listMonths year
+      months = @listMonths year
       for month in months
         break if count >= numRecents
-        files = listEntries year, month
+        files = @listEntries year, month
         for file in files
           match = /^(\d+)(-\d+)?-(.*)\.md$/.exec file
           if not match?
             continue
 
-          filepath = "#{basedir}/#{year}/#{month}/#{file}"
+          filepath = "#{@basedir}/#{year}/#{month}/#{file}"
           markdown = fs.readFileSync filepath, {encoding:'utf8'}
           lex = marked.Lexer.lex(markdown)
-          title = findTitleFromLex(lex) ? ''
+          title = @findTitleFromLex(lex) ? ''
           body = marked.Parser.parse(lex)
           date = match[1]
           part = match[2] ? ''
@@ -318,307 +609,15 @@ init = (initOpts) ->
             break
 
     # Hold index in recentInfo
-    recentInfo =
+    @recentInfo =
       recentFiles: recentFiles
       generatedTime: new Date().getTime()
 
     elapsedTime = new Date().getTime() - startTime
-    logMessage "done (#{elapsedTime} ms)", noTime:true
+    @logMessage "done (#{elapsedTime} ms)", noTime:true
 
-  # Single entry (e.g. /2013/05/26/how_i_learned_javascript)
-  app.get /^\/(\d{4})\/(\d{2})\/(\d+)(-\d+)?\/(.*)$/, (req, res, next) ->
-    year  = req.params[0]
-    month = req.params[1]
-    date  = req.params[2]
-    part  = req.params[3] ? ''
-    slug  = req.params[4]
-    datepart = date + part
-    filepath = "#{basedir}/#{year}/#{month}/#{datepart}-#{slug}.md"
-    fs.exists filepath, (exists) ->
-      if not exists
-        # Find static file that matches URL
-        staticPath = "#{basedir}/#{year}/#{month}/#{slug}"
-        fs.stat staticPath, (err, stats) ->
-          if err
-            respondWithNotFound res
-          else if stats.isDirectory()
-            next()  # Will match the next route
-          else
-            res.sendfile staticPath
-        return
-      fs.readFile filepath, {encoding:'utf8'}, (err, markdown) ->
-        if err
-          logMessage err
-          respondWithServerError res
-          return
-        formatPage {
-          markdown: markdown
-          link    : "/#{year}/#{month}/#{datepart}/#{slug}"
-          year    : year
-          month   : month
-          date    : date
-        }, (err, html) ->
-          if err
-            logMessage err
-            respondWithServerError res
-            return
-          res.setHeader 'Content-Type', 'text/html; charset=utf-8'
-          res.send html
-
-  # Redirect /2013/05/27/ to /2013/05/ (after matching against the previous route)
-  app.get /^\/(\d{4})\/(\d{2})\/[\d-]+\/?/, (req, res) ->
-    year  = req.params[0]
-    month = req.params[1]
-    res.redirect "/#{year}/#{month}/"
-
-  # List of years
-  app.get '/archives', (req, res) ->
-    years = listYears()
-    markdown = """
-    ## Archives
-
-    """
-    for year in years
-      markdown += "[#{year}](/#{year}/)\n"
-    formatPage {
-      markdown   : markdown
-      noTitleLink: true
-      noAuthor   : true
-    }, (err, html) ->
-      if err
-        logMessage err
-        respondWithServerError res
-        return
-      res.setHeader 'Content-Type', 'text/html; charset=utf-8'
-      res.send html
-
-  # Archives for a year (e.g. /2013/)
-  app.get /^\/(\d{4})\/?$/, (req, res) ->
-    year = req.params[0]
-    months = listMonths year
-    markdown = """
-    ## Archives for #{year}
-
-    """
-    for month in months
-      markdown += "[#{year}-#{month}](/#{year}/#{month}/)\n"
-    formatPage {
-      markdown   : markdown
-      noTitleLink: true
-      noAuthor   : true
-    }, (err, html) ->
-      if err
-        logMessage err
-        respondWithServerError res
-        return
-      res.setHeader 'Content-Type', 'text/html; charset=utf-8'
-      res.send html
-
-  # Archives for a month (e.g. /2013/05/)
-  app.get /^\/(\d{4})\/(\d{2})\/?$/, (req, res) ->
-    year = req.params[0]
-    month = req.params[1]
-    files = listEntries year, month
-    markdown = """
-    ## Archives for [#{year}](/#{year}/)-#{month}
-
-    """
-    for file in files
-      match = /^(\d+)(-\d+)?-(.*)\.md$/.exec file
-      date = match[1]
-      part = match[2] ? ''
-      slug = match[3]
-      datepart = date + part
-
-      filepath = "#{basedir}/#{year}/#{month}/#{file}"
-      content = fs.readFileSync filepath, {encoding:'utf8'}
-      lex = marked.Lexer.lex(content)
-      title = findTitleFromLex(lex) ? ''
-      markdown += "#{formatDate year, month, date} " + \
-      "[#{title or '(untitled)'}](/#{year}/#{month}/#{datepart}/#{slug})\n"
-    formatPage {
-      markdown   : markdown
-      title      : "Archives for #{year}-#{month}"
-      noTitleLink: true
-      noAuthor   : true
-    }, (err, html) ->
-      if err
-        logMessage err
-        respondWithServerError res
-        return
-      res.setHeader 'Content-Type', 'text/html; charset=utf-8'
-      res.send html
-
-  # Recent entries
-  app.get '/recents', (req, res) ->
-    markdown = """
-    ## Recent Entries
-
-    """
-    for file in recentInfo.recentFiles
-      entryUrl = "/#{file.year}/#{file.month}/#{file.datepart}/#{file.slug}"
-      ymd = formatDate file.year, file.month, file.date
-      markdown += "#{ymd} [#{file.title or '(untitled)'}](#{entryUrl})\n"
-    markdown += "\n\n[Archives](/archives)"
-    formatPage {
-      markdown   : markdown
-      noTitleLink: true
-      noAuthor   : true
-    }, (err, html) ->
-      if err
-        logMessage err
-        respondWithServerError res
-        return
-      res.setHeader 'Content-Type', 'text/html; charset=utf-8'
-      res.send html
-
-  # Atom feed
-  app.get '/index.atom', (req, res) ->
-    buf = """
-    <?xml version="1.0" encoding="utf-8"?>
-    <feed xmlns="http://www.w3.org/2005/Atom">
-    <title>#{config.siteName}</title>
-    <link href="#{config.siteURL}/index.atom" rel="self" />
-    <link href="#{config.siteURL}" />
-    <id>#{escapeTags config.siteURL + '/'}</id>
-    <updated>#{new Date(recentInfo.generatedTime).toISOString()}</updated>
-    """
-    for file in recentInfo.recentFiles
-      html = convertToAbsoluteLinks file.body, {
-        year       : file.year
-        month      : file.month
-        date       : file.date
-        absoluteURL: true
-      }
-      entryUrl = "#{config.siteURL}/#{file.year}/#{file.month}/#{file.datepart}/#{file.slug}"
-      title = file.title
-      if (not title?) or (title is '')
-        title = '(untitled)'
-      buf += """
-    <entry>
-      <title>#{escapeTags title}</title>
-      <link href="#{entryUrl}" />
-      <id>#{entryUrl}</id>
-      <updated>#{new Date(file.time).toISOString()}</updated>
-      <content type="html">#{escapeTags html}</content>
-      <author>
-        <name>#{escapeTags config.authorName}</name>
-        <uri>#{escapeTags config.authorLink}</uri>
-
-      """
-      if config.authorEmail
-        buf += "    <email>#{config.authorEmail}</email>"
-      buf += """
-
-      </author>
-    </entry>
-      """
-    buf += "\n</feed>\n"
-    res.setHeader 'Content-Type', 'text/xml; charset=utf-8'
-    res.send buf
-
-  # Homepage: display the most recent entry
-  app.get '/', (req, res) ->
-    file = recentInfo.recentFiles[0]
-    if not file?
-      res.setHeader 'Content-Type', 'text/plain; charset=utf-8'
-      # Empty content message
-      res.send """
-      This is the place where your content will appear.
-
-      Add a first entry like this:
-
-      mkdir -p 2013/05
-      echo "# Test\\n\\nHello World" > 2013/05/27-test.md
-      git add .
-      git commit -m "add test entry"
-      git push origin master
-
-      Finished? Then reload this page slowly.
-      """
-      return
-    filepath = "#{basedir}/#{file.year}/#{file.month}/#{file.datepart}-#{file.slug}.md"
-    fs.readFile filepath, {encoding:'utf8'}, (err, markdown) ->
-      if err
-        logMessage err
-        respondWithServerError res
-        return
-      url = "/#{file.year}/#{file.month}/#{file.datepart}/#{file.slug}"
-      formatPage {
-        markdown    : markdown
-        link        : url
-        year        : file.year
-        month       : file.month
-        date        : file.date
-        noTitle     : true
-        absolutePath: true
-      }, (err, html) ->
-        if err
-          logMessage err
-          respondWithServerError res
-          return
-        res.setHeader 'Content-Type', 'text/html; charset=utf-8'
-        res.send html
-
-  # Not found
-  app.get '*', (req, res) ->
-    respondWithNotFound res
-
-  # Log unhandled errors
-  app.use (err, req, res, next) ->
-    console.error err.stack
-    next err
-
-  startServer = (callback) ->
-    if fs.existsSync reindexCheckFilename
-      fs.unlink reindexCheckFilename
-
-    # Watch reindex-needed to be created
-    fs.watchFile reindexCheckFilename, (curr, prev) ->
-      if curr.nlink > 0
-        fs.unlink reindexCheckFilename, ->
-          createIndex()
-
-    # Watch config.json to be updated
-    fs.watchFile configFilename, (curr, prev) ->
-      err = loadConfig()
-      if not err?
-        logMessage "loaded #{path.basename configFilename}"
-
-    # Load page template and watch it for change
-    pageTemplate = fs.readFileSync pageTemplateFilename, {encoding:'utf8'}
-    fs.watchFile pageTemplateFilename, (curr, prev) ->
-      fs.readFile pageTemplateFilename, {encoding:'utf8'}, (err, data) ->
-        if err
-          logMessage "#{pageTemplateFilename} read error: #{err}"
-          return
-        pageTemplate = data
-        logMessage "loaded #{path.basename pageTemplateFilename}"
-
-    createIndex()
-    httpServer.listen PORT
-    httpServer.on 'listening', ->
-      logMessage "Server started on port #{httpServer.address().port}"
-
-    httpServer
-
-  stopServer = ->
-    fs.unwatchFile reindexCheckFilename
-    fs.unwatchFile configFilename
-    fs.unwatchFile pageTemplateFilename
-
-    httpServer.close ->
-      logMessage "Server closed"
-
-  if initOpts?.autoStart
-    startServer()
-
-  # return
-  start: startServer
-  stop : stopServer
-
-module.exports = init
+module.exports = BitterServer
 
 if not module.parent?
   # This script is being run directly
-  init autoStart:true
+  new BitterServer autoStart:true
