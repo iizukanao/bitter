@@ -42,6 +42,8 @@ describe 'method', ->
     it 'should return an expected result', ->
       assert.strictEqual bitterServer.formatDate('2013', '06', '09'),
         'June 9, 2013'
+      assert.strictEqual bitterServer.formatDate('2020', '12', '31'),
+        'December 31, 2020'
 
 describe 'server', ->
   before (done) ->
