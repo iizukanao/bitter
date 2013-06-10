@@ -32,6 +32,12 @@ _request = ->
 
   request.apply null, args[0..args.length-2].concat callback
 
+describe 'method', ->
+  describe 'escapeTags', ->
+    it 'should return an escaped string', ->
+      assert.strictEqual bitterServer.escapeTags('<h1>Night & "Day"</h1>'),
+        '&lt;h1&gt;Night &amp; &quot;Day&quot;&lt;/h1&gt;'
+
 describe 'server', ->
   before (done) ->
     if fs.existsSync "#{basedir}/2013/05/30-new.md"
