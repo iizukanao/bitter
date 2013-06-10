@@ -38,6 +38,11 @@ describe 'method', ->
       assert.strictEqual bitterServer.escapeTags('<h1>Night & "Day"</h1>'),
         '&lt;h1&gt;Night &amp; &quot;Day&quot;&lt;/h1&gt;'
 
+  describe 'formatDate', ->
+    it 'should return an expected result', ->
+      assert.strictEqual bitterServer.formatDate('2013', '06', '09'),
+        'June 9, 2013'
+
 describe 'server', ->
   before (done) ->
     if fs.existsSync "#{basedir}/2013/05/30-new.md"
