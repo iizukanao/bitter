@@ -34,7 +34,7 @@ _request = ->
 
 describe 'method', ->
   describe 'escapeTags', ->
-    it 'should return an escaped string', ->
+    it 'should return an expected result', ->
       assert.strictEqual bitterServer.escapeTags('<h1>Night & "Day"</h1>'),
         '&lt;h1&gt;Night &amp; &quot;Day&quot;&lt;/h1&gt;'
 
