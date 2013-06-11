@@ -47,6 +47,11 @@ describe 'method', ->
       assert.strictEqual bitterServer.formatDate('2001', '01', '01'),
         'January 1, 2001'
 
+  describe 'obfuscateEmail', ->
+    it 'should return expected result', ->
+      assert.strictEqual bitterServer.obfuscateEmail('test@example.com'),
+        '&#116;&#101;&#115;&#116;&#64;&#101;&#120;&#97;&#109;&#112;&#108;&#101;&#46;&#99;&#111;&#109;'
+
 describe 'server', ->
   before (done) ->
     if fs.existsSync "#{basedir}/2013/05/30-new.md"
