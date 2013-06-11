@@ -34,12 +34,12 @@ _request = ->
 
 describe 'method', ->
   describe 'escapeTags', ->
-    it 'should return an expected result', ->
+    it 'should return expected result', ->
       assert.strictEqual bitterServer.escapeTags('<h1>Night & "Day"</h1>'),
         '&lt;h1&gt;Night &amp; &quot;Day&quot;&lt;/h1&gt;'
 
   describe 'formatDate', ->
-    it 'should return an expected result', ->
+    it 'should return expected result', ->
       assert.strictEqual bitterServer.formatDate('2013', '06', '09'),
         'June 9, 2013'
       assert.strictEqual bitterServer.formatDate('2020', '12', '31'),
