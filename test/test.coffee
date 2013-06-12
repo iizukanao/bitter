@@ -2,6 +2,7 @@ fs         = require 'fs'
 assert     = require 'assert'
 request    = require 'request'
 FeedParser = require 'feedparser'
+marked     = require 'marked'
 
 basedir = "#{__dirname}/notes"
 
@@ -51,6 +52,16 @@ describe 'method', ->
     it 'should return expected result', ->
       assert.strictEqual bitterServer.obfuscateEmail('test@example.com'),
         '&#116;&#101;&#115;&#116;&#64;&#101;&#120;&#97;&#109;&#112;&#108;&#101;&#46;&#99;&#111;&#109;'
+
+  describe 'findTitleFromLex', ->
+    it 'should return expected result', ->
+      markdown = """
+      # Hello Markdown
+
+      Test
+      """
+      title = bitterServer.findTitleFromLex marked.Lexer.lex markdown
+      assert.strictEqual title, 'Hello Markdown'
 
 describe 'server', ->
   before (done) ->
