@@ -63,6 +63,14 @@ describe 'method', ->
       title = bitterServer.findTitleFromLex marked.Lexer.lex markdown
       assert.strictEqual title, 'Hello Markdown'
 
+      markdown = """
+      ## Sub-heading & Title
+
+      Test
+      """
+      title = bitterServer.findTitleFromLex marked.Lexer.lex markdown
+      assert.strictEqual title, 'Sub-heading & Title'
+
 describe 'server', ->
   before (done) ->
     if fs.existsSync "#{basedir}/2013/05/30-new.md"
