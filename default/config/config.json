@@ -3,5 +3,7 @@
   "siteURL"    : "http://blog.example.com",
   "authorName" : "Nanashino Bombay",
   "authorLink" : "http://example.com/",
-  "authorEmail": ""
+  "authorEmail": "",
+  "homepage"   : "default",
+  "numRecents" : 15
 }
