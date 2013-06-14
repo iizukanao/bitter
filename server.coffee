@@ -196,11 +196,12 @@ class BitterServer extends events.EventEmitter
 
     # Recent entries
     @app.get '/recents', (req, res) =>
+      numRecents = @config.numRecents ? @recentInfo.recentFiles.length
       markdown = """
       ## Recent Entries
 
       """
-      for file in @recentInfo.recentFiles
+      for file in @recentInfo.recentFiles[...numRecents]
         entryUrl = "/#{file.year}/#{file.month}/#{file.datepart}/#{file.slug}"
         ymd = @formatDate file.year, file.month, file.date
         markdown += "#{ymd} [#{file.title or '(untitled)'}](#{entryUrl})\n"
@@ -228,7 +229,8 @@ class BitterServer extends events.EventEmitter
       <id>#{@escapeTags @config.siteURL + '/'}</id>
       <updated>#{new Date(@recentInfo.generatedTime).toISOString()}</updated>
       """
-      for file in @recentInfo.recentFiles
+      numRecents = @config.numRecents ? @recentInfo.recentFiles.length
+      for file in @recentInfo.recentFiles[...numRecents]
         html = @convertToAbsoluteLinks file.body, {
           year       : file.year
           month      : file.month
@@ -262,48 +264,12 @@ class BitterServer extends events.EventEmitter
       res.setHeader 'Content-Type', 'text/xml; charset=utf-8'
       res.send buf
 
-    # Homepage: display the most recent entry
+    # Homepage
     @app.get '/', (req, res) =>
-      file = @recentInfo.recentFiles[0]
-      if not file?
-        res.setHeader 'Content-Type', 'text/plain; charset=utf-8'
-        # Empty content message
-        res.send """
-        This is the place where your content will appear.
-
-        Add a first entry like this:
-
-        mkdir -p 2013/05
-        echo "# Test\\n\\nHello World" > 2013/05/27-test.md
-        git add .
-        git commit -m "add test entry"
-        git push origin master
-
-        Finished? Then reload this page slowly.
-        """
-        return
-      filepath = "#{@basedir}/#{file.year}/#{file.month}/#{file.datepart}-#{file.slug}.md"
-      fs.readFile filepath, {encoding:'utf8'}, (err, markdown) =>
-        if err
-          @logMessage err
-          @respondWithServerError res
-          return
-        url = "/#{file.year}/#{file.month}/#{file.datepart}/#{file.slug}"
-        @formatPage {
-          markdown    : markdown
-          link        : url
-          year        : file.year
-          month       : file.month
-          date        : file.date
-          noTitle     : true
-          absolutePath: true
-        }, (err, html) =>
-          if err
-            @logMessage err
-            @respondWithServerError res
-            return
-          res.setHeader 'Content-Type', 'text/html; charset=utf-8'
-          res.send html
+      if @config.homepage is 'recents'
+        @serveRecents req, res
+      else
+        @serveMostRecentEntry req, res
 
     # Not found
     @app.get '*', (req, res) =>
@@ -333,6 +299,7 @@ class BitterServer extends events.EventEmitter
       err = @loadConfig()
       if not err?
         @logMessage "loaded #{path.basename @configFilename}"
+        @createIndex()
 
     # Load page template and watch it for change
     @pageTemplate = fs.readFileSync @pageTemplateFilename, {encoding:'utf8'}
@@ -569,7 +536,11 @@ class BitterServer extends events.EventEmitter
     files
 
   # Scan entries and update index
-  createIndex: (numRecents=15) ->
+  createIndex: (numRecents) ->
+    if not numRecents?
+      numRecents = @config.numRecents ? 15
+      if @config.numHomepageRecents?
+        numRecents = Math.max @config.numHomepageRecents, numRecents
     @logMessage "indexing...", noNewline:true
     startTime = new Date().getTime()
     count = 0
@@ -615,6 +586,69 @@ class BitterServer extends events.EventEmitter
 
     elapsedTime = new Date().getTime() - startTime
     @logMessage "done (#{elapsedTime} ms)", noTime:true
+
+  # Serve homepage in recents style
+  serveRecents: (req, res) ->
+    numRecents = @config.numHomepageRecents ? @config.numRecents ? 5
+    markdown = ''
+    for file in @recentInfo.recentFiles[...numRecents]
+      entryUrl = "/#{file.year}/#{file.month}/#{file.datepart}/#{file.slug}"
+      markdown += "[#{file.title or '(untitled)'}](#{entryUrl})\n"
+    @formatPage {
+      markdown   : markdown
+      noTitleLink: true
+      noAuthor   : true
+      noTitle    : true
+    }, (err, html) =>
+      if err
+        @logMessage err
+        @respondWithServerError res
+        return
+      res.setHeader 'Content-Type', 'text/html; charset=utf-8'
+      res.send html
+
+  # Show the most recent entry on homepage
+  serveMostRecentEntry: (req, res) ->
+    file = @recentInfo.recentFiles[0]
+    if not file?
+      res.setHeader 'Content-Type', 'text/plain; charset=utf-8'
+      # Empty content message
+      res.send """
+      This is the place where your content will appear.
+
+      Add a first entry like this:
+
+      mkdir -p 2013/05
+      echo "# Test\\n\\nHello World" > 2013/05/27-test.md
+      git add .
+      git commit -m "add test entry"
+      git push origin master
+
+      Finished? Then reload this page slowly.
+      """
+      return
+    filepath = "#{@basedir}/#{file.year}/#{file.month}/#{file.datepart}-#{file.slug}.md"
+    fs.readFile filepath, {encoding:'utf8'}, (err, markdown) =>
+      if err
+        @logMessage err
+        @respondWithServerError res
+        return
+      url = "/#{file.year}/#{file.month}/#{file.datepart}/#{file.slug}"
+      @formatPage {
+        markdown    : markdown
+        link        : url
+        year        : file.year
+        month       : file.month
+        date        : file.date
+        noTitle     : true
+        absolutePath: true
+      }, (err, html) =>
+        if err
+          @logMessage err
+          @respondWithServerError res
+          return
+        res.setHeader 'Content-Type', 'text/html; charset=utf-8'
+        res.send html
 
 module.exports = BitterServer
 
