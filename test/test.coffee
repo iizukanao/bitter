@@ -183,7 +183,7 @@ describe 'server', ->
         assert.strictEqual err, null, 'No errors'
         assert.strictEqual resp.statusCode, 200, 'Status code is 200'
         assert.strictEqual resp.headers['content-type'], 'text/html; charset=utf-8', 'content-type'
-        assertSameContent body, 'banana'
+        assertSameContent body, 'untitled'
         done()
 
   describe '/2013/05/26/apple', ->
@@ -335,7 +335,7 @@ describe 'server', ->
           assert.strictEqual articles[2].title, 'Markdown Example'
           assert.strictEqual articles[3].title, 'Zucchini Bread'
           assert.strictEqual articles[4].title, 'Cake Box'
-          assert.strictEqual articles[5].title, 'Banana'
+          assert.strictEqual articles[5].title, '(untitled)'
           assert.strictEqual articles[6].title, 'Apple'
           assert.strictEqual articles[7].title, 'Day 26'
           done()
