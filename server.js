@@ -194,11 +194,12 @@
         });
       });
       this.app.get('/recents', function(req, res) {
-        var entryUrl, file, markdown, ymd, _i, _len, _ref3;
+        var entryUrl, file, markdown, numRecents, ymd, _i, _len, _ref3, _ref4;
+        numRecents = (_ref3 = _this.config.numRecents) != null ? _ref3 : _this.recentInfo.recentFiles.length;
         markdown = "## Recent Entries\n";
-        _ref3 = _this.recentInfo.recentFiles;
-        for (_i = 0, _len = _ref3.length; _i < _len; _i++) {
-          file = _ref3[_i];
+        _ref4 = _this.recentInfo.recentFiles.slice(0, numRecents);
+        for (_i = 0, _len = _ref4.length; _i < _len; _i++) {
+          file = _ref4[_i];
           entryUrl = "/" + file.year + "/" + file.month + "/" + file.datepart + "/" + file.slug;
           ymd = _this.formatDate(file.year, file.month, file.date);
           markdown += "" + ymd + " [" + (file.title || '(untitled)') + "](" + entryUrl + ")\n";
@@ -219,11 +220,12 @@
         });
       });
       this.app.get('/index.atom', function(req, res) {
-        var buf, entryUrl, file, html, title, _i, _len, _ref3;
+        var buf, entryUrl, file, html, numRecents, title, _i, _len, _ref3, _ref4;
         buf = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<feed xmlns=\"http://www.w3.org/2005/Atom\">\n<title>" + _this.config.siteName + "</title>\n<link href=\"" + _this.config.siteURL + "/index.atom\" rel=\"self\" />\n<link href=\"" + _this.config.siteURL + "\" />\n<id>" + (_this.escapeTags(_this.config.siteURL + '/')) + "</id>\n<updated>" + (new Date(_this.recentInfo.generatedTime).toISOString()) + "</updated>";
-        _ref3 = _this.recentInfo.recentFiles;
-        for (_i = 0, _len = _ref3.length; _i < _len; _i++) {
-          file = _ref3[_i];
+        numRecents = (_ref3 = _this.config.numRecents) != null ? _ref3 : _this.recentInfo.recentFiles.length;
+        _ref4 = _this.recentInfo.recentFiles.slice(0, numRecents);
+        for (_i = 0, _len = _ref4.length; _i < _len; _i++) {
+          file = _ref4[_i];
           html = _this.convertToAbsoluteLinks(file.body, {
             year: file.year,
             month: file.month,
@@ -246,42 +248,11 @@
         return res.send(buf);
       });
       this.app.get('/', function(req, res) {
-        var file, filepath;
-        file = _this.recentInfo.recentFiles[0];
-        if (file == null) {
-          res.setHeader('Content-Type', 'text/plain; charset=utf-8');
-          res.send("This is the place where your content will appear.\n\nAdd a first entry like this:\n\nmkdir -p 2013/05\necho \"# Test\\n\\nHello World\" > 2013/05/27-test.md\ngit add .\ngit commit -m \"add test entry\"\ngit push origin master\n\nFinished? Then reload this page slowly.");
-          return;
+        if (_this.config.homepage === 'recents') {
+          return _this.serveRecents(req, res);
+        } else {
+          return _this.serveMostRecentEntry(req, res);
         }
-        filepath = "" + _this.basedir + "/" + file.year + "/" + file.month + "/" + file.datepart + "-" + file.slug + ".md";
-        return fs.readFile(filepath, {
-          encoding: 'utf8'
-        }, function(err, markdown) {
-          var url;
-          if (err) {
-            _this.logMessage(err);
-            _this.respondWithServerError(res);
-            return;
-          }
-          url = "/" + file.year + "/" + file.month + "/" + file.datepart + "/" + file.slug;
-          return _this.formatPage({
-            markdown: markdown,
-            link: url,
-            year: file.year,
-            month: file.month,
-            date: file.date,
-            noTitle: true,
-            absolutePath: true
-          }, function(err, html) {
-            if (err) {
-              _this.logMessage(err);
-              _this.respondWithServerError(res);
-              return;
-            }
-            res.setHeader('Content-Type', 'text/html; charset=utf-8');
-            return res.send(html);
-          });
-        });
       });
       this.app.get('*', function(req, res) {
         return _this.respondWithNotFound(res);
@@ -312,7 +283,8 @@
         var err;
         err = _this.loadConfig();
         if (err == null) {
-          return _this.logMessage("loaded " + (path.basename(_this.configFilename)));
+          _this.logMessage("loaded " + (path.basename(_this.configFilename)));
+          return _this.createIndex();
         }
       });
       this.pageTemplate = fs.readFileSync(this.pageTemplateFilename, {
@@ -609,9 +581,12 @@
     };
 
     BitterServer.prototype.createIndex = function(numRecents) {
-      var body, count, date, elapsedTime, file, filepath, files, lex, markdown, match, month, months, part, recentFiles, slug, startTime, title, year, years, _i, _j, _k, _len, _len1, _len2, _ref, _ref1;
+      var body, count, date, elapsedTime, file, filepath, files, lex, markdown, match, month, months, part, recentFiles, slug, startTime, title, year, years, _i, _j, _k, _len, _len1, _len2, _ref, _ref1, _ref2;
       if (numRecents == null) {
-        numRecents = 15;
+        numRecents = (_ref = this.config.numRecents) != null ? _ref : 15;
+        if (this.config.numHomepageRecents != null) {
+          numRecents = Math.max(this.config.numHomepageRecents, numRecents);
+        }
       }
       this.logMessage("indexing...", {
         noNewline: true
@@ -643,10 +618,10 @@
               encoding: 'utf8'
             });
             lex = marked.Lexer.lex(markdown);
-            title = (_ref = this.findTitleFromLex(lex)) != null ? _ref : '';
+            title = (_ref1 = this.findTitleFromLex(lex)) != null ? _ref1 : '';
             body = marked.Parser.parse(lex);
             date = match[1];
-            part = (_ref1 = match[2]) != null ? _ref1 : '';
+            part = (_ref2 = match[2]) != null ? _ref2 : '';
             slug = match[3];
             recentFiles.push({
               time: new Date("" + year + "-" + month + "-" + date + " 00:00:00").getTime(),
@@ -672,6 +647,73 @@
       elapsedTime = new Date().getTime() - startTime;
       return this.logMessage("done (" + elapsedTime + " ms)", {
         noTime: true
+      });
+    };
+
+    BitterServer.prototype.serveRecents = function(req, res) {
+      var entryUrl, file, markdown, numRecents, _i, _len, _ref, _ref1, _ref2,
+        _this = this;
+      numRecents = (_ref = (_ref1 = this.config.numHomepageRecents) != null ? _ref1 : this.config.numRecents) != null ? _ref : 5;
+      markdown = '';
+      _ref2 = this.recentInfo.recentFiles.slice(0, numRecents);
+      for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
+        file = _ref2[_i];
+        entryUrl = "/" + file.year + "/" + file.month + "/" + file.datepart + "/" + file.slug;
+        markdown += "[" + (file.title || '(untitled)') + "](" + entryUrl + ")\n";
+      }
+      return this.formatPage({
+        markdown: markdown,
+        noTitleLink: true,
+        noAuthor: true,
+        noTitle: true
+      }, function(err, html) {
+        if (err) {
+          _this.logMessage(err);
+          _this.respondWithServerError(res);
+          return;
+        }
+        res.setHeader('Content-Type', 'text/html; charset=utf-8');
+        return res.send(html);
+      });
+    };
+
+    BitterServer.prototype.serveMostRecentEntry = function(req, res) {
+      var file, filepath,
+        _this = this;
+      file = this.recentInfo.recentFiles[0];
+      if (file == null) {
+        res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+        res.send("This is the place where your content will appear.\n\nAdd a first entry like this:\n\nmkdir -p 2013/05\necho \"# Test\\n\\nHello World\" > 2013/05/27-test.md\ngit add .\ngit commit -m \"add test entry\"\ngit push origin master\n\nFinished? Then reload this page slowly.");
+        return;
+      }
+      filepath = "" + this.basedir + "/" + file.year + "/" + file.month + "/" + file.datepart + "-" + file.slug + ".md";
+      return fs.readFile(filepath, {
+        encoding: 'utf8'
+      }, function(err, markdown) {
+        var url;
+        if (err) {
+          _this.logMessage(err);
+          _this.respondWithServerError(res);
+          return;
+        }
+        url = "/" + file.year + "/" + file.month + "/" + file.datepart + "/" + file.slug;
+        return _this.formatPage({
+          markdown: markdown,
+          link: url,
+          year: file.year,
+          month: file.month,
+          date: file.date,
+          noTitle: true,
+          absolutePath: true
+        }, function(err, html) {
+          if (err) {
+            _this.logMessage(err);
+            _this.respondWithServerError(res);
+            return;
+          }
+          res.setHeader('Content-Type', 'text/html; charset=utf-8');
+          return res.send(html);
+        });
       });
     };
 
