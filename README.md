@@ -138,13 +138,13 @@ Also checkout the branch in localblogdir/notes.git.
 
 ### config/config.json parameters
 
-`siteName` (string) The name of the site.
-`siteURL` (string) Base URL of the site.
-`authorName` (string) Author's name.
-`authorLink` (string) URL that is linked from author's name.
-`authorEmail` (string) Author's email address.
-`homepage` (string) Front page style. "default" or "recents" can be specified. Default value is "default".
-`numRecents` (number) Number of entries in /recents and Atom feed. Default value is 15.
-`numHomepageRecents` (number) Number of entries in front page. This is valid only if `homepage` is set to "recents". Default value is 5.
+`siteName` (string) The name of the site.  
+`siteURL` (string) Base URL of the site.  
+`authorName` (string) Author's name.  
+`authorLink` (string) URL that is linked from author's name.  
+`authorEmail` (string) Author's email address.  
+`homepage` (string) Front page style. "default" or "recents" can be specified. Default value is "default".  
+`numRecents` (number) Number of entries in /recents and Atom feed. Default value is 15.  
+`numHomepageRecents` (number) Number of entries in front page. This is valid only if `homepage` is set to "recents". Default value is 5.  
 
 To effect changes of config.json on the server, commit config.json and push it.
