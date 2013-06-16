@@ -148,3 +148,16 @@ Also checkout the branch in localblogdir/notes.git.
 `numHomepageRecents` (number) Number of entries in front page. This is valid only if `homepage` is set to "recents". Default value is 5.  
 
 To effect changes of config.json on the server, commit config.json and push it.
+
+#### config.json example
+
+    {
+      "siteName"   : "MyLittleBlog",
+      "siteURL"    : "http://blog.example.com",
+      "authorName" : "Nanashino Bombay",
+      "authorLink" : "http://example.com/",
+      "authorEmail": "you@example.com",
+      "homepage"   : "recents",
+      "numRecents" : 15,
+      "numHomepageRecents": 5
+    }
