@@ -28,7 +28,7 @@ class BitterServer extends events.EventEmitter
     @port = opts?.port ? process.env.PORT ? 1341
 
     # Path to config.json
-    @configFilename = "#{@basedir}/config/config.json"
+    @configFilename = opts?.configFilename ? "#{@basedir}/config/config.json"
 
     # EJS template for formatting pages
     @pageTemplateFilename = "#{@basedir}/config/page.ejs"
