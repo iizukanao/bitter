@@ -32,12 +32,12 @@
     __extends(BitterServer, _super);
 
     function BitterServer(opts) {
-      var err, _ref, _ref1, _ref2,
+      var err, _ref, _ref1, _ref2, _ref3,
         _this = this;
       this.constructorOpts = opts;
       this.basedir = (_ref = opts != null ? opts.basedir : void 0) != null ? _ref : path.normalize("" + (process.cwd()) + "/notes");
       this.port = (_ref1 = (_ref2 = opts != null ? opts.port : void 0) != null ? _ref2 : process.env.PORT) != null ? _ref1 : 1341;
-      this.configFilename = "" + this.basedir + "/config/config.json";
+      this.configFilename = (_ref3 = opts != null ? opts.configFilename : void 0) != null ? _ref3 : "" + this.basedir + "/config/config.json";
       this.pageTemplateFilename = "" + this.basedir + "/config/page.ejs";
       this.reindexCheckFilename = "" + this.basedir + "/reindex-needed";
       this.config = null;
@@ -57,11 +57,11 @@
       this.app.use(express.responseTime());
       this.app.use(express["static"]("" + this.basedir + "/public"));
       this.app.get(/^\/(\d{4})\/(\d{2})\/(\d+)(-\d+)?\/(.*)$/, function(req, res, next) {
-        var date, datepart, filepath, month, part, slug, year, _ref3;
+        var date, datepart, filepath, month, part, slug, year, _ref4;
         year = req.params[0];
         month = req.params[1];
         date = req.params[2];
-        part = (_ref3 = req.params[3]) != null ? _ref3 : '';
+        part = (_ref4 = req.params[3]) != null ? _ref4 : '';
         slug = req.params[4];
         datepart = date + part;
         filepath = "" + _this.basedir + "/" + year + "/" + month + "/" + datepart + "-" + slug + ".md";
@@ -158,7 +158,7 @@
         });
       });
       this.app.get(/^\/(\d{4})\/(\d{2})\/?$/, function(req, res) {
-        var content, date, datepart, file, filepath, files, lex, markdown, match, month, part, slug, title, year, _i, _len, _ref3, _ref4;
+        var content, date, datepart, file, filepath, files, lex, markdown, match, month, part, slug, title, year, _i, _len, _ref4, _ref5;
         year = req.params[0];
         month = req.params[1];
         files = _this.listEntries(year, month);
@@ -167,7 +167,7 @@
           file = files[_i];
           match = /^(\d+)(-\d+)?-(.*)\.md$/.exec(file);
           date = match[1];
-          part = (_ref3 = match[2]) != null ? _ref3 : '';
+          part = (_ref4 = match[2]) != null ? _ref4 : '';
           slug = match[3];
           datepart = date + part;
           filepath = "" + _this.basedir + "/" + year + "/" + month + "/" + file;
@@ -175,7 +175,7 @@
             encoding: 'utf8'
           });
           lex = marked.Lexer.lex(content);
-          title = (_ref4 = _this.findTitleFromLex(lex)) != null ? _ref4 : '';
+          title = (_ref5 = _this.findTitleFromLex(lex)) != null ? _ref5 : '';
           markdown += ("" + (_this.formatDate(year, month, date)) + " ") + ("[" + (title || '(untitled)') + "](/" + year + "/" + month + "/" + datepart + "/" + slug + ")\n");
         }
         return _this.formatPage({
@@ -194,12 +194,12 @@
         });
       });
       this.app.get('/recents', function(req, res) {
-        var entryUrl, file, markdown, numRecents, ymd, _i, _len, _ref3, _ref4;
-        numRecents = (_ref3 = _this.config.numRecents) != null ? _ref3 : _this.recentInfo.recentFiles.length;
+        var entryUrl, file, markdown, numRecents, ymd, _i, _len, _ref4, _ref5;
+        numRecents = (_ref4 = _this.config.numRecents) != null ? _ref4 : _this.recentInfo.recentFiles.length;
         markdown = "## Recent Entries\n";
-        _ref4 = _this.recentInfo.recentFiles.slice(0, numRecents);
-        for (_i = 0, _len = _ref4.length; _i < _len; _i++) {
-          file = _ref4[_i];
+        _ref5 = _this.recentInfo.recentFiles.slice(0, numRecents);
+        for (_i = 0, _len = _ref5.length; _i < _len; _i++) {
+          file = _ref5[_i];
           entryUrl = "/" + file.year + "/" + file.month + "/" + file.datepart + "/" + file.slug;
           ymd = _this.formatDate(file.year, file.month, file.date);
           markdown += "" + ymd + " [" + (file.title || '(untitled)') + "](" + entryUrl + ")\n";
@@ -220,12 +220,12 @@
         });
       });
       this.app.get('/index.atom', function(req, res) {
-        var buf, entryUrl, file, html, numRecents, title, _i, _len, _ref3, _ref4;
+        var buf, entryUrl, file, html, numRecents, title, _i, _len, _ref4, _ref5;
         buf = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<feed xmlns=\"http://www.w3.org/2005/Atom\">\n<title>" + _this.config.siteName + "</title>\n<link href=\"" + _this.config.siteURL + "/index.atom\" rel=\"self\" />\n<link href=\"" + _this.config.siteURL + "\" />\n<id>" + (_this.escapeTags(_this.config.siteURL + '/')) + "</id>\n<updated>" + (new Date(_this.recentInfo.generatedTime).toISOString()) + "</updated>";
-        numRecents = (_ref3 = _this.config.numRecents) != null ? _ref3 : _this.recentInfo.recentFiles.length;
-        _ref4 = _this.recentInfo.recentFiles.slice(0, numRecents);
-        for (_i = 0, _len = _ref4.length; _i < _len; _i++) {
-          file = _ref4[_i];
+        numRecents = (_ref4 = _this.config.numRecents) != null ? _ref4 : _this.recentInfo.recentFiles.length;
+        _ref5 = _this.recentInfo.recentFiles.slice(0, numRecents);
+        for (_i = 0, _len = _ref5.length; _i < _len; _i++) {
+          file = _ref5[_i];
           html = _this.convertToAbsoluteLinks(file.body, {
             year: file.year,
             month: file.month,
