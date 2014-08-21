@@ -30,7 +30,7 @@
     "request": "2.21.x",
     "mocha": "1.10.x",
     "feedparser": "0.15.x",
-    "coffee-script": "1.x"
+    "coffee-script": "1.7.x"
   },
   "license": "MIT",
   "engines": {
