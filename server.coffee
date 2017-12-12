@@ -472,19 +472,20 @@ class BitterServer extends events.EventEmitter
 
     # Link title
     if not input.noTitleLink
-      body = body.replace /<(h\d)>(.*?)<\/\1>/, \
-      "<$1><a href=\"#{input.link}\">$2</a></$1>"
+      body = body.replace /<(h\d)([^>]*)>(.*?)<\/\1>/, \
+      "<$1$2><a href=\"#{input.link}\">$3</a></$1>"
 
     # Create anchors for headings
     if input.anchorHeading isnt false
       headingCount = -1
-      body = body.replace /<(h\d)>(.*?)<\/\1>/g, (match, p1, p2) ->
+      body = body.replace /<(h\d)([^>]*)>(.*?)<\/\1>/g, (match, p1, p2, p3) ->
         if ++headingCount > 0
-          "<#{p1} class=\"anchor\" id=\"heading_#{headingCount}\">" + \
-          "<a href=\"#heading_#{headingCount}\">#{p2}</a></#{p1}>"
+          "<#{p1}#{p2} class=\"anchor\" id=\"heading_#{headingCount}\">" + \
+          "<a href=\"#heading_#{headingCount}\">#{p3}</a></#{p1}>"
         else
           match
-    body = body.replace /<(h\d)>/, "<$1 class=\"title\">"
+    body = body.replace /<(h\d)([^>]*)>/, "<$1$2 class=\"title\">"
+    body = body.replace /(<h\d) id="[^"]*"/g, '$1'
 
     # Object to be passed to template
     opts =
