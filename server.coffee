@@ -107,7 +107,7 @@ class BitterServer extends events.EventEmitter
               @logMessage err
               @respondWithServerError res
               return
-            res.setHeader 'Content-Type', 'text/html; charset=utf-8'
+            res.set 'Content-Type', 'text/html; charset=utf-8'
             res.send html
 
     # Redirect /2013/05/27/ to /2013/05/ (after matching against the previous route)
@@ -134,7 +134,7 @@ class BitterServer extends events.EventEmitter
           @logMessage err
           @respondWithServerError res
           return
-        res.setHeader 'Content-Type', 'text/html; charset=utf-8'
+        res.set 'Content-Type', 'text/html; charset=utf-8'
         res.send html
 
     # Archives for a year (e.g. /2013/)
@@ -156,7 +156,7 @@ class BitterServer extends events.EventEmitter
           @logMessage err
           @respondWithServerError res
           return
-        res.setHeader 'Content-Type', 'text/html; charset=utf-8'
+        res.set 'Content-Type', 'text/html; charset=utf-8'
         res.send html
 
     # Archives for a month (e.g. /2013/05/)
@@ -191,7 +191,7 @@ class BitterServer extends events.EventEmitter
           @logMessage err
           @respondWithServerError res
           return
-        res.setHeader 'Content-Type', 'text/html; charset=utf-8'
+        res.set 'Content-Type', 'text/html; charset=utf-8'
         res.send html
 
     # Recent entries
@@ -215,7 +215,7 @@ class BitterServer extends events.EventEmitter
           @logMessage err
           @respondWithServerError res
           return
-        res.setHeader 'Content-Type', 'text/html; charset=utf-8'
+        res.set 'Content-Type', 'text/html; charset=utf-8'
         res.send html
 
     # Atom feed
@@ -261,7 +261,7 @@ class BitterServer extends events.EventEmitter
       </entry>
         """
       buf += "\n</feed>\n"
-      res.setHeader 'Content-Type', 'text/xml; charset=utf-8'
+      res.set 'Content-Type', 'text/xml; charset=utf-8'
       res.send buf
 
     # Homepage
@@ -383,7 +383,7 @@ class BitterServer extends events.EventEmitter
         @logMessage err
         res.send 500, 'Server error'
         return
-      res.setHeader 'Content-Type', 'text/html; charset=utf-8'
+      res.set 'Content-Type', 'text/html; charset=utf-8'
       res.send 500, html
 
   # 404 Not Found
@@ -399,7 +399,7 @@ class BitterServer extends events.EventEmitter
         @logMessage err
         @respondWithServerError res
         return
-      res.setHeader 'Content-Type', 'text/html; charset=utf-8'
+      res.set 'Content-Type', 'text/html; charset=utf-8'
       res.send 404, html
 
   # Find first heading from lex object
@@ -605,14 +605,14 @@ class BitterServer extends events.EventEmitter
         @logMessage err
         @respondWithServerError res
         return
-      res.setHeader 'Content-Type', 'text/html; charset=utf-8'
+      res.set 'Content-Type', 'text/html; charset=utf-8'
       res.send html
 
   # Show the most recent entry on homepage
   serveMostRecentEntry: (req, res) ->
     file = @recentInfo.recentFiles[0]
     if not file?
-      res.setHeader 'Content-Type', 'text/plain; charset=utf-8'
+      res.set 'Content-Type', 'text/plain; charset=utf-8'
       # Empty content message
       res.send """
       This is the place where your content will appear.
@@ -648,7 +648,7 @@ class BitterServer extends events.EventEmitter
           @logMessage err
           @respondWithServerError res
           return
-        res.setHeader 'Content-Type', 'text/html; charset=utf-8'
+        res.set 'Content-Type', 'text/html; charset=utf-8'
         res.send html
 
 module.exports = BitterServer
