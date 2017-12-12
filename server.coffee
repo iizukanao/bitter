@@ -3,9 +3,11 @@ path    = require 'path'
 http    = require 'http'
 events  = require 'events'
 
-ejs     = require 'ejs'
-marked  = require 'marked'
-express = require 'express'
+ejs          = require 'ejs'
+marked       = require 'marked'
+compression  = require 'compression'
+responseTime = require 'response-time'
+express      = require 'express'
 
 # Markdown formatting options
 marked.setOptions
@@ -62,10 +64,10 @@ class BitterServer extends events.EventEmitter
     #@app.use express.logger()
 
     # gzip/deflate response
-    @app.use express.compress()
+    @app.use compression()
 
     # Add X-Response-Time to response header
-    @app.use express.responseTime()
+    @app.use responseTime()
 
     # Serve static files in #{@basedir}/public
     @app.use express.static "#{@basedir}/public"
@@ -89,7 +91,7 @@ class BitterServer extends events.EventEmitter
             else if stats.isDirectory()
               next()  # Will match the next route
             else
-              res.sendfile staticPath
+              res.sendFile staticPath
           return
         fs.readFile filepath, {encoding:'utf8'}, (err, markdown) =>
           if err
@@ -381,10 +383,10 @@ class BitterServer extends events.EventEmitter
     @formatPage {markdown:markdown, noTitleLink:true, noAuthor:true}, (err, html) =>
       if err
         @logMessage err
-        res.send 500, 'Server error'
+        res.status(500).send('Server error')
         return
       res.set 'Content-Type', 'text/html; charset=utf-8'
-      res.send 500, html
+      res.status(500).send(html)
 
   # 404 Not Found
   respondWithNotFound: (res) ->
@@ -400,7 +402,7 @@ class BitterServer extends events.EventEmitter
         @respondWithServerError res
         return
       res.set 'Content-Type', 'text/html; charset=utf-8'
-      res.send 404, html
+      res.status(404).send(html)
 
   # Find first heading from lex object
   findTitleFromLex: (lex) ->

@@ -22,9 +22,11 @@
     "markdown"
   ],
   "dependencies": {
+    "compression": "^1.7.1",
+    "ejs": "2.5.x",
     "express": "4.x",
     "marked": "=0.3.7",
-    "ejs": "2.5.x"
+    "response-time": "^2.3.2"
   },
   "devDependencies": {
     "request": "2.83.x",
