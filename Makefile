@@ -1,9 +1,9 @@
-MOCHA_OPTS= --compilers coffee:coffee-script/register --check-leaks
+MOCHA_OPTS= --require coffee-script/register --check-leaks
 REPORTER = dot
 
 test:
 	./node_modules/.bin/mocha \
 	  --reporter $(REPORTER) \
-	  $(MOCHA_OPTS)
+	  $(MOCHA_OPTS) "test/*.coffee"
 
 .PHONY: test
