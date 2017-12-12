@@ -32,8 +32,8 @@
 <pre><code>console.log &quot;hello&quot;
 setTimeout -&gt;
   console.log &quot;world&quot;
-, 1000</code></pre>
-<blockquote>
+, 1000
+</code></pre><blockquote>
 <p>This is a blockquote.</p>
 </blockquote>
 <hr>
@@ -42,25 +42,25 @@ setTimeout -&gt;
 <thead>
 <tr>
 <th>Item</th>
-<th align="right">Price</th>
-<th align="right">Quantity</th>
+<th style="text-align:right">Price</th>
+<th style="text-align:right">Quantity</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>Coffee</td>
-<td align="right">$1.49</td>
-<td align="right">2</td>
+<td style="text-align:right">$1.49</td>
+<td style="text-align:right">2</td>
 </tr>
 <tr>
 <td>Tea</td>
-<td align="right">$1.39</td>
-<td align="right">1</td>
+<td style="text-align:right">$1.39</td>
+<td style="text-align:right">1</td>
 </tr>
 <tr>
 <td>Cake</td>
-<td align="right">$2.99</td>
-<td align="right">3</td>
+<td style="text-align:right">$2.99</td>
+<td style="text-align:right">3</td>
 </tr>
 </tbody>
 </table>
@@ -68,8 +68,8 @@ setTimeout -&gt;
 <p>You can embed images like this.</p>
 <p><img src="images/winter.jpg" alt="Winter"></p>
 <p>Using this code:</p>
-<pre><code>![Winter](images/winter.jpg)</code></pre>
-</div>
+<pre><code>![Winter](images/winter.jpg)
+</code></pre></div>
 <div class="author">Posted by <a href="http://kyu-mu.net/">Nao Iizuka</a></div><div class="powered-by">
   Powered by <a href="http://notes.kyu-mu.net/2013/05/29/introducing_bitter_blog_engine">Bitter</a>
 </div>

@@ -308,21 +308,20 @@ describe 'server', ->
         assert.strictEqual err, null, 'No errors'
         assert.strictEqual resp.statusCode, 200, 'Status code is 200'
         assert.strictEqual resp.headers['content-type'], 'text/xml; charset=utf-8', 'content-type'
-        FeedParser.parseString(body)
-        .on('error', (err) ->
+        feedparser = new FeedParser
+        feedparser.on('error', (err) ->
           assert.fail err, null, 'Error on parsing Atom feed'
-        ).on('meta', (m) ->
-          meta = m
-        ).on('article', (article) ->
-          articles.push article
-        ).on('end', ->
+        )
+        feedparser.on('end', ->
+          meta = this.meta
           assert.strictEqual meta.title, 'MyLittleNotes', 'meta.title'
           assert.strictEqual meta['atom:link'][0]['@'].href,
             'http://notes.kyu-mu.net/index.atom', 'atom:link'
           assert.strictEqual meta['atom:@'].xmlns, 'http://www.w3.org/2005/Atom', 'xmlns'
+          articles = this.articles
           assert.strictEqual articles.length, 8, '8 articles'
           assert.strictEqual articles[0].title, 'Bitter blog engine', 'articles[0].title'
-          assert (articles[0].description.indexOf('<h1>Bitter blog engine</h1>') isnt -1),
+          assert /<h1[^>]*>Bitter blog engine<\/h1>/.test(articles[0].description),
             'articles[0].description'
           assert.strictEqual articles[0].date.getTime(),
             new Date('2013-05-29 00:00:00').getTime(),
@@ -340,6 +339,7 @@ describe 'server', ->
           assert.strictEqual articles[7].title, 'Day 26'
           done()
         )
+        feedparser.end body
 
   describe 'reindex-needed', ->
     it 'should be used to update an index', (done) ->
