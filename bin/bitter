@@ -1,6 +1,6 @@
 #!/bin/sh
 
-VERSION=0.3.4
+VERSION=0.3.5
 
 get_script_dir () {
   bin_dir=$(dirname $0)
