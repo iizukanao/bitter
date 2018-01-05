@@ -25,7 +25,7 @@
     "compression": "^1.7.1",
     "ejs": "2.5.x",
     "express": "4.x",
-    "marked": "=0.3.7",
+    "marked": "~0.3.9",
     "response-time": "^2.3.2"
   },
   "devDependencies": {
