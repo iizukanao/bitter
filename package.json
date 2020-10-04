@@ -23,15 +23,15 @@
     "markdown"
   ],
   "dependencies": {
-    "compression": "^1.7.1",
-    "ejs": "2.5.x",
+    "compression": "^1.7.4",
+    "ejs": "3.1.x",
     "express": "4.x",
-    "marked": "~0.3.9",
+    "marked": "~1.2.0",
     "response-time": "^2.3.2"
   },
   "devDependencies": {
-    "request": "2.83.x",
-    "mocha": "4.0.x",
+    "request": "2.88.x",
+    "mocha": "8.1.x",
     "feedparser": "2.2.x",
     "coffee-script": "1.12.x"
   },
