@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/iizukanao/bitter.png)](https://travis-ci.org/iizukanao/bitter)
+[![Build Status](https://travis-ci.org/iizukanao/bitter.svg?branch=master)](https://travis-ci.org/iizukanao/bitter)
 
 ## Bitter - a minimal blog engine
 
