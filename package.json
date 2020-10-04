@@ -8,6 +8,7 @@
     "bitter": "bin/bitter"
   },
   "scripts": {
+    "build": "coffee -c server.coffee",
     "test": "make test"
   },
   "repository": {
