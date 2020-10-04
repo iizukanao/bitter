@@ -32,34 +32,34 @@
 <pre><code>$ npm install -g bitter
 $ mkdir blogdir
 $ cd blogdir
-$ bitter setup
-</code></pre><p>次のコマンドでサーバを起動します。環境変数PORTでポート番号を指定します。</p>
-<pre><code>$ PORT=1341 bitter server
-</code></pre><p>nginxやApacheと組み合わせて使う場合はリバースプロキシを使ってください。</p>
+$ bitter setup</code></pre>
+<p>次のコマンドでサーバを起動します。環境変数PORTでポート番号を指定します。</p>
+<pre><code>$ PORT=1341 bitter server</code></pre>
+<p>nginxやApacheと組み合わせて使う場合はリバースプロキシを使ってください。</p>
 <p>ローカル側では、記事ディレクトリをcloneします。</p>
-<pre><code>$ git clone user@host:blogdir/notes.git
-</code></pre><h3 class="anchor" id="heading_4"><a href="#heading_4">記事を投稿する</a></h3>
+<pre><code>$ git clone user@host:blogdir/notes.git</code></pre>
+<h3 class="anchor" id="heading_4"><a href="#heading_4">記事を投稿する</a></h3>
 <p>ローカルでcloneした記事ディレクトリ内で、<code>年/月/日-slug.md</code>のようなファイル名でMarkdownを作成し、pushすると公開されます。</p>
 <pre><code>$ mkdir -p 2013/05
 $ echo &quot;# Test\n\nHello World&quot; &gt; 2013/05/27-test.md
 $ git add .
 $ git commit -m &quot;add test entry&quot;  # メッセージは何でもOK
-$ git push origin master
-</code></pre><h3 class="anchor" id="heading_5"><a href="#heading_5">既存の記事を編集する</a></h3>
+$ git push origin master</code></pre>
+<h3 class="anchor" id="heading_5"><a href="#heading_5">既存の記事を編集する</a></h3>
 <pre><code>$ vim 2013/05/27-test.md
 $ git add -u
 $ git commit -m update  # メッセージは何でもOK
-$ git push origin master
-</code></pre><h3 class="anchor" id="heading_6"><a href="#heading_6">記事を削除する</a></h3>
+$ git push origin master</code></pre>
+<h3 class="anchor" id="heading_6"><a href="#heading_6">記事を削除する</a></h3>
 <pre><code>$ git rm 2013/05/27-test.md
 $ git commit -m delete  # メッセージは何でもOK
-$ git push origin master
-</code></pre><h3 class="anchor" id="heading_7"><a href="#heading_7">画像を埋め込む</a></h3>
+$ git push origin master</code></pre>
+<h3 class="anchor" id="heading_7"><a href="#heading_7">画像を埋め込む</a></h3>
 <p>記事と同じディレクトリ以下に画像ファイルを置くと、相対パスで参照できます。例えば、2013/05/images/winter.jpgを埋め込むには、2013/05/27-test.mdに次のように書きます。</p>
-<pre><code>![Winter photo](images/winter.jpg)
-</code></pre><p>一方、publicディレクトリ以下にファイルを置くと、絶対パスで参照できます。例えば、public/images/spring.jpgを埋め込むには次のように書きます。</p>
-<pre><code>![Spring photo](/images/spring.jpg)
-</code></pre></div>
+<pre><code>![Winter photo](images/winter.jpg)</code></pre>
+<p>一方、publicディレクトリ以下にファイルを置くと、絶対パスで参照できます。例えば、public/images/spring.jpgを埋め込むには次のように書きます。</p>
+<pre><code>![Spring photo](/images/spring.jpg)</code></pre>
+</div>
 <div class="author">Posted by <a href="http://kyu-mu.net/">Nao Iizuka</a></div><div class="powered-by">
   Powered by <a href="http://notes.kyu-mu.net/2013/05/29/introducing_bitter_blog_engine">Bitter</a>
 </div>
