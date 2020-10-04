@@ -142,7 +142,11 @@ class BitterServer extends events.EventEmitter
     # Archives for a year (e.g. /2013/)
     @app.get /^\/(\d{4})\/?$/, (req, res) =>
       year = req.params[0]
-      months = @listMonths year
+      try
+        months = @listMonths year
+      catch e
+        @respondWithNotFound res
+        return
       markdown = """
       ## Archives for #{year}
 
@@ -165,7 +169,11 @@ class BitterServer extends events.EventEmitter
     @app.get /^\/(\d{4})\/(\d{2})\/?$/, (req, res) =>
       year = req.params[0]
       month = req.params[1]
-      files = @listEntries year, month
+      try
+        files = @listEntries year, month
+      catch e
+        @respondWithNotFound res
+        return
       markdown = """
       ## Archives for [#{year}](/#{year}/)-#{month}
 
