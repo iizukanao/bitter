@@ -143,9 +143,15 @@
       })(this));
       this.app.get(/^\/(\d{4})\/?$/, (function(_this) {
         return function(req, res) {
-          var j, len, markdown, month, months, year;
+          var e, j, len, markdown, month, months, year;
           year = req.params[0];
-          months = _this.listMonths(year);
+          try {
+            months = _this.listMonths(year);
+          } catch (error) {
+            e = error;
+            _this.respondWithNotFound(res);
+            return;
+          }
           markdown = "## Archives for " + year + "\n";
           for (j = 0, len = months.length; j < len; j++) {
             month = months[j];
@@ -168,10 +174,16 @@
       })(this));
       this.app.get(/^\/(\d{4})\/(\d{2})\/?$/, (function(_this) {
         return function(req, res) {
-          var content, date, datepart, file, filepath, files, j, len, lex, markdown, match, month, part, ref4, ref5, slug, title, year;
+          var content, date, datepart, e, file, filepath, files, j, len, lex, markdown, match, month, part, ref4, ref5, slug, title, year;
           year = req.params[0];
           month = req.params[1];
-          files = _this.listEntries(year, month);
+          try {
+            files = _this.listEntries(year, month);
+          } catch (error) {
+            e = error;
+            _this.respondWithNotFound(res);
+            return;
+          }
           markdown = "## Archives for [" + year + "](/" + year + "/)-" + month + "\n";
           for (j = 0, len = files.length; j < len; j++) {
             file = files[j];
