@@ -26,14 +26,14 @@
     "compression": "^1.7.4",
     "ejs": "3.1.x",
     "express": "4.x",
-    "marked": "~1.2.0",
+    "marked": "^4.0.18",
     "response-time": "^2.3.2"
   },
   "devDependencies": {
-    "request": "2.88.x",
-    "mocha": "8.1.x",
+    "coffee-script": "1.12.x",
     "feedparser": "2.2.x",
-    "coffee-script": "1.12.x"
+    "mocha": "8.1.x",
+    "request": "2.88.x"
   },
   "license": "MIT",
   "engines": {

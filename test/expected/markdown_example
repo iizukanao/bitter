@@ -32,7 +32,8 @@
 <pre><code>console.log &quot;hello&quot;
 setTimeout -&gt;
   console.log &quot;world&quot;
-, 1000</code></pre>
+, 1000
+</code></pre>
 <blockquote>
 <p>This is a blockquote.</p>
 </blockquote>
@@ -66,7 +67,8 @@ setTimeout -&gt;
 <p>You can embed images like this.</p>
 <p><img src="images/winter.jpg" alt="Winter"></p>
 <p>Using this code:</p>
-<pre><code>![Winter](images/winter.jpg)</code></pre>
+<pre><code>![Winter](images/winter.jpg)
+</code></pre>
 </div>
 <div class="author">Posted by <a href="http://kyu-mu.net/">Nao Iizuka</a></div><div class="powered-by">
   Powered by <a href="http://notes.kyu-mu.net/2013/05/29/introducing_bitter_blog_engine">Bitter</a>

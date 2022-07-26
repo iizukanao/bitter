@@ -33,34 +33,42 @@
 <pre><code>$ npm install -g bitter
 $ mkdir blogdir
 $ cd blogdir
-$ bitter setup</code></pre>
+$ bitter setup
+</code></pre>
 <p>After setup completed, run the server. Specify listen port with environment variable PORT.</p>
-<pre><code>$ PORT=1341 bitter server</code></pre>
+<pre><code>$ PORT=1341 bitter server
+</code></pre>
 <p>If you&#39;re going to use with nginx or Apache, configure them to use reverse proxy.</p>
 <p>On the local machine, clone blogdir/notes.git.</p>
-<pre><code>$ git clone user@host:blogdir/notes.git</code></pre>
+<pre><code>$ git clone user@host:blogdir/notes.git
+</code></pre>
 <h2 class="anchor" id="heading_3"><a href="#heading_3">To post an entry</a></h2>
 <p>In the cloned repository on the local machine, write an article in Markdown, then save it as <code>year/month/date-slug.md</code>. Do <code>git push</code> to publish it.</p>
 <pre><code>$ mkdir -p 2013/05
 $ echo &quot;# Test\n\nHello World&quot; &gt; 2013/05/27-test.md
 $ git add .
 $ git commit -m &quot;add test entry&quot;
-$ git push origin master</code></pre>
+$ git push origin master
+</code></pre>
 <p>Commit message has no effect on Bitter.</p>
 <h2 class="anchor" id="heading_4"><a href="#heading_4">To edit an existing entry</a></h2>
 <pre><code>$ vim 2013/05/27-test.md
 $ git add -u
 $ git commit -m update
-$ git push origin master</code></pre>
+$ git push origin master
+</code></pre>
 <h2 class="anchor" id="heading_5"><a href="#heading_5">To delete an entry</a></h2>
 <pre><code>$ git rm 2013/05/27-test.md
 $ git commit -m delete
-$ git push origin master</code></pre>
+$ git push origin master
+</code></pre>
 <h2 class="anchor" id="heading_6"><a href="#heading_6">To embed static files</a></h2>
 <p>Put your static files under the directory that article resides. Those files can be referred to by relative path. For example, to embed 2013/05/images/winter.jpg, write following code in 2013/05/27-test.md.</p>
-<pre><code>![Winter photo](images/winter.jpg)</code></pre>
+<pre><code>![Winter photo](images/winter.jpg)
+</code></pre>
 <p>If you put static files under &quot;public&quot; directory, those files can be referred to by absolute path. For example, to embed public/images/spring.jpg:</p>
-<pre><code>![Spring photo](/images/spring.jpg)</code></pre>
+<pre><code>![Spring photo](/images/spring.jpg)
+</code></pre>
 </div>
 <div class="author">Posted by <a href="http://kyu-mu.net/">Nao Iizuka</a></div><div class="powered-by">
   Powered by <a href="http://notes.kyu-mu.net/2013/05/29/introducing_bitter_blog_engine">Bitter</a>
